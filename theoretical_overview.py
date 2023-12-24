@@ -250,15 +250,15 @@ def location_accuracy_statistics(data, city_mapping, output_path=None):
 if __name__ == '__main__':
     data_cities = utilities.get_cities_data()
     city_mapping = utilities.get_city_mapping()
-    # accident_statistics_by_city_table(data_cities, city_mapping,
-    #                                   output_path='data/theoretical overview/accident_statistics_by_city.csv')
-    # accident_clusters_statistics_by_city_table(data_cities, city_mapping,
-    #                                                    output_path='data/theoretical overview/'
-    #                                                                'accident_clusters_statistics_by_city.csv')
-    # accident_clusters_statistics_by_attribute_table(data_cities,
-    #                                                 output_path='data/theoretical overview/'
-    #                                                             'accident_clusters_statistics_by_attribute.csv')
-    # outliers_percentage_table(data_cities, output_path='data/theoretical overview/outliers_percentage.csv')
+    accident_statistics_by_city_table(data_cities, city_mapping,
+                                      output_path='data/theoretical overview/accident_statistics_by_city.csv')
+    accident_clusters_statistics_by_city_table(data_cities, city_mapping,
+                                                       output_path='data/theoretical overview/'
+                                                                   'accident_clusters_statistics_by_city.csv')
+    accident_clusters_statistics_by_attribute_table(data_cities,
+                                                    output_path='data/theoretical overview/'
+                                                                'accident_clusters_statistics_by_attribute.csv')
+    outliers_percentage_table(data_cities, output_path='data/theoretical overview/outliers_percentage.csv')
     data = utilities.get_accidents_data()
     location_accuracy_statistics(data,city_mapping, output_path='data/theoretical overview/location_accuracy.csv')
     # data_cities = pd.read_csv('data/processed data/cities_accidents.csv', index_col='pk_teuna_fikt')
