@@ -238,17 +238,28 @@ def outliers_percentage_table(data, output_path=None):
     return result_df
 
 
+def location_accuracy_statistics(data, city_mapping, output_path=None):
+    data = data[data['SEMEL_YISHUV'].isin(city_mapping.keys())]
+    grouped = data.groupby(['STATUS_IGUN','HUMRAT_TEUNA']).size().reset_index(name='count')
+    grouped['normalized_count'] = grouped['count'] / grouped['count'].sum()
+    if output_path:
+        grouped.to_csv(output_path, index=False)
+    return grouped
+
+
 if __name__ == '__main__':
     data_cities = utilities.get_cities_data()
     city_mapping = utilities.get_city_mapping()
-    accident_statistics_by_city_table(data_cities, city_mapping,
-                                      output_path='data/theoretical overview/accident_statistics_by_city.csv')
-    accident_clusters_statistics_by_city_table(data_cities, city_mapping,
-                                                       output_path='data/theoretical overview/'
-                                                                   'accident_clusters_statistics_by_city.csv')
-    accident_clusters_statistics_by_attribute_table(data_cities,
-                                                    output_path='data/theoretical overview/'
-                                                                'accident_clusters_statistics_by_attribute.csv')
-    outliers_percentage_table(data_cities, output_path='data/theoretical overview/outliers_percentage.csv')
+    # accident_statistics_by_city_table(data_cities, city_mapping,
+    #                                   output_path='data/theoretical overview/accident_statistics_by_city.csv')
+    # accident_clusters_statistics_by_city_table(data_cities, city_mapping,
+    #                                                    output_path='data/theoretical overview/'
+    #                                                                'accident_clusters_statistics_by_city.csv')
+    # accident_clusters_statistics_by_attribute_table(data_cities,
+    #                                                 output_path='data/theoretical overview/'
+    #                                                             'accident_clusters_statistics_by_attribute.csv')
+    # outliers_percentage_table(data_cities, output_path='data/theoretical overview/outliers_percentage.csv')
+    data = utilities.get_accidents_data()
+    location_accuracy_statistics(data,city_mapping, output_path='data/theoretical overview/location_accuracy.csv')
     # data_cities = pd.read_csv('data/processed data/cities_accidents.csv', index_col='pk_teuna_fikt')
     # accident_clusters_statistics_by_city_table(data_cities, city_mapping, output_path='try.csv')
