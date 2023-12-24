@@ -68,4 +68,3 @@ def get_cities_data(save_path=None):
 if __name__ == '__main__':
     # save data
     get_cities_data(r'data\processed data\cities_accidents.csv')
-    # get_accidents_data(r'data\processed data\all_accidents.csv')

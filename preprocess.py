@@ -34,6 +34,7 @@ def preprocess(data, start_year, end_year, train_interval, save_path=None):
             attribute_df = attribute_df[['cluster', f'{attribute}_majority_vote']]
             df_clusters = pd.merge(df_clusters, attribute_df, on='cluster', how='outer')
         df_clusters['cluster'] = str(train_start) + df_clusters['cluster'].astype(str)
+        df_clusters['train_start'] = train_start
         list_of_dfs.append(df_clusters)
     result_df = pd.concat(list_of_dfs, ignore_index=True)
     if save_path is not None:
