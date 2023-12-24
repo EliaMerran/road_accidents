@@ -56,9 +56,10 @@ def get_cities_data(save_path=None):
     data = get_accidents_data()
     data = data[data.SHNAT_TEUNA.between(config.START_YEAR, config.END_YEAR)]
     city_info = get_city_info(sort_by_population=True)
-    city_mapping = city_info[:20].set_index('סמל יישוב')['שם יישוב באנגלית'].to_dict()
+    city_mapping = city_info[:config.NUM_CITIES].set_index('סמל יישוב')['שם יישוב באנגלית'].to_dict()
     data_cities = data[data['SEMEL_YISHUV'].isin(city_mapping.keys())]
     data_cities = data_cities[data_cities.STATUS_IGUN == 1]
+    data_cities['BAKARA'] = data_cities['BAKARA'].fillna(0)
     if save_path is not None:
         data_cities.to_csv(save_path)
     return data_cities

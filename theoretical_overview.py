@@ -164,7 +164,7 @@ def accident_clusters_statistics_by_attribute_table(data, output_path=None):
             for option in options:
                 conditions = (df_per[f'{attribute}_majority_vote'] == option)
                 df_per['Accidents Percentage'] = np.where(conditions,
-                                                          df_per[option] / df_per[options].sum(axis=1),
+                                                          (df_per[option] / df_per[options].sum(axis=1)) * 100,
                                                           df_per['Accidents Percentage'])
 
             df_grouped = res.groupby([f'{attribute}_majority_vote', 'type']).size().reset_index(name='count')
@@ -179,8 +179,9 @@ def accident_clusters_statistics_by_attribute_table(data, output_path=None):
             df_grouped['min_cluster_size'] = config.MIN_CLUSTER_SIZE
             df_grouped = df_grouped.pivot(index='attribute_majority_vote', columns='cluster_type',
                                           values='count').fillna(0).astype(int)
-            df_grouped.insert(0, 'clusters_count', df_grouped.sum(axis=1))
-            df_grouped.insert(1, 'clusters_percent', df_grouped.sum(axis=1) / n_cluster * 100)
+            cluster_count = df_grouped.sum(axis=1)
+            df_grouped.insert(0, 'clusters_count', cluster_count)
+            df_grouped.insert(1, 'clusters_percent', cluster_count / n_cluster * 100)
             df_grouped.reset_index(inplace=True)
             df_grouped.columns.name = None
             df_grouped['severe_turnaround_probability'] = (df_grouped['Severe Turnaround'] / (
@@ -205,6 +206,38 @@ def accident_clusters_statistics_by_attribute_table(data, output_path=None):
     return result_df
 
 
+def outliers_percentage_table(data, output_path=None):
+    list_of_dfs = []
+    for train_start in range(config.START_YEAR, config.END_YEAR - config.TRAIN_INTERVAL + 1):
+        train_end = train_start + config.TRAIN_INTERVAL - 1
+        test_start = train_end + 1
+        test_end = test_start
+        train_data, test_data = preprocess.cluster_frame(data, train_start, train_end, test_start, test_end)
+
+        # Group by 'HUMRAT_TEUNA' and count the number of occurrences for each group
+        grouped_df = train_data.groupby('HUMRAT_TEUNA').size().reset_index(name='total_count')
+
+        # Filter the DataFrame for rows where 'cluster' is equal to -1
+        outliers = train_data[train_data['cluster'] == -1]
+
+        # Group by 'HUMRAT_TEUNA' in the cluster -1 DataFrame and count the number of occurrences for each group
+        outliers_grouped = outliers.groupby('HUMRAT_TEUNA').size().reset_index(name='outliers_count')
+
+        # Merge the two DataFrames based on 'HUMRAT_TEUNA'
+        merged_df = pd.merge(grouped_df, outliers_grouped, on='HUMRAT_TEUNA', how='left')
+
+        # Fill NaN values with 0 (for cases where there are no accidents in cluster -1 for a specific 'HUMRAT_TEUNA')
+        merged_df['outliers_count'].fillna(0, inplace=True)
+
+        # Calculate the percentage for each 'HUMRAT_TEUNA'
+        merged_df['percentage_outliers'] = (merged_df['outliers_count'] / merged_df['total_count']) * 100
+        list_of_dfs.append(merged_df)
+    result_df = pd.concat(list_of_dfs).groupby('HUMRAT_TEUNA', as_index=False).mean()
+    if output_path:
+        result_df.to_csv(output_path, index=False)
+    return result_df
+
+
 if __name__ == '__main__':
     data_cities = utilities.get_cities_data()
     city_mapping = utilities.get_city_mapping()
@@ -216,6 +249,6 @@ if __name__ == '__main__':
     accident_clusters_statistics_by_attribute_table(data_cities,
                                                     output_path='data/theoretical overview/'
                                                                 'accident_clusters_statistics_by_attribute.csv')
-
+    outliers_percentage_table(data_cities, output_path='data/theoretical overview/outliers_percentage.csv')
     # data_cities = pd.read_csv('data/processed data/cities_accidents.csv', index_col='pk_teuna_fikt')
     # accident_clusters_statistics_by_city_table(data_cities, city_mapping, output_path='try.csv')

@@ -20,19 +20,7 @@ def preprocess(data, start_year, end_year, train_interval, save_path=None):
         df_clusters = add_severe_count(df_clusters, train_data, 'train_severe')
         df_clusters = add_severe_count(df_clusters, test_data, 'test_severe')
         df_clusters = df_clusters[df_clusters.cluster != -1]
-        # Define the conditions
-        conditions = [
-            (df_clusters['train_severe'] == 0) & (df_clusters['test_severe'] > 0),
-            (df_clusters['train_severe'] == 0) & (df_clusters['test_severe'] == 0),
-            (df_clusters['train_severe'] > 0) & (df_clusters['test_severe'] > 0),
-            (df_clusters['train_severe'] > 0) & (df_clusters['test_severe'] == 0)
-        ]
-
-        # Define the corresponding values for each condition
-        values = ['Severe Turnaround', 'Stable Safety', 'Consistent Severity', 'Improved Safety']
-
-        # Create the 'type' column based on the conditions
-        df_clusters['type'] = np.select(conditions, values, default='Undefined')
+        df_clusters = add_cluster_type(df_clusters)
         for attribute in config.ATTRIBUTES_DICT.keys():
             attribute_df = get_clusters_by_attribute(train_data, test_data, attribute,
                                                      config.ATTRIBUTES_DICT[attribute])
@@ -84,6 +72,37 @@ def get_clusters_by_attribute(train_frame, test_frame, attribute, attribute_dict
     df_clusters = add_severe_count(df_clusters, train_frame, 'train_severe')
     df_clusters = add_severe_count(df_clusters, test_frame, 'test_severe')
 
+    df_clusters = add_cluster_type(df_clusters)
+
+    # Rename the columns
+    df_clusters.rename(columns=attribute_dict, inplace=True)
+    filtered_dict = {key: value for key, value in attribute_dict.items() if value != 'unknown'}
+
+    # Create a new column 'traffic_light_majority_vote'
+    attribute_columns = [col for col in filtered_dict.values() if col in df_clusters.columns]
+    if len(attribute_columns):
+        df_clusters[f'{attribute}_majority_vote'] = df_clusters[attribute_columns].idxmax(axis=1)
+        # Set 'unknown' if the maximum value is 0
+        mask_zero_max = df_clusters[attribute_columns].max(axis=1) == 0
+        df_clusters.loc[mask_zero_max, f'{attribute}_majority_vote'] = 'unknown'
+    else:
+        df_clusters[f'{attribute}_majority_vote'] = 'unknown'
+    df_clusters = df_clusters[df_clusters.cluster != -1]
+    return df_clusters
+
+
+def add_severe_count(df_clusters, frame, column_name):
+    df_clusters = df_clusters.merge(
+        frame[frame['HUMRAT_TEUNA'] < 3].groupby('cluster').size().reset_index(name=column_name),
+        how='left',
+        on='cluster'
+    )
+    df_clusters[column_name].fillna(0, inplace=True)
+    df_clusters[column_name] = df_clusters[column_name].astype(int)
+    return df_clusters
+
+
+def add_cluster_type(df_clusters):
     # Define the conditions
     conditions = [
         (df_clusters['train_severe'] == 0) & (df_clusters['test_severe'] > 0),
@@ -97,33 +116,6 @@ def get_clusters_by_attribute(train_frame, test_frame, attribute, attribute_dict
 
     # Create the 'type' column based on the conditions
     df_clusters['type'] = np.select(conditions, values, default='Undefined')
-
-    # Rename the columns
-    df_clusters.rename(columns=attribute_dict, inplace=True)
-    filtered_dict = {key: value for key, value in attribute_dict.items() if value != 'Unknown'}
-
-    # Create a new column 'traffic_light_majority_vote'
-    attribute_columns = [col for col in filtered_dict.values() if col in df_clusters.columns]
-    if len(attribute_columns):
-        df_clusters[f'{attribute}_majority_vote'] = df_clusters[attribute_columns].idxmax(axis=1)
-        # Set 'Unknown' if the maximum value is 0
-        mask_zero_max = df_clusters[attribute_columns].max(axis=1) == 0
-        df_clusters.loc[mask_zero_max, f'{attribute}_majority_vote'] = 'Unknown'
-    else:
-        df_clusters[f'{attribute}_majority_vote'] = 'Unknown'
-    df_clusters = df_clusters[df_clusters.cluster != -1]
-    return df_clusters
-
-
-def add_severe_count(df_clusters, frame, column_name):
-    df_clusters = df_clusters.merge(
-        frame[frame['HUMRAT_TEUNA'] < 3].groupby('cluster').size().reset_index(name=column_name),
-        how='left',
-        on='cluster'
-    )
-    # df[column_name] = df[df['HUMRAT_TEUNA'] < 3].groupby('cluster').size()
-    df_clusters[column_name].fillna(0, inplace=True)
-    df_clusters[column_name] = df_clusters[column_name].astype(int)
     return df_clusters
 
 
