@@ -31,8 +31,8 @@ ATTRIBUTES_DICT['HUMRAT_TEUNA'][4] = 'property damage'
 
 # Add 0:'unknown' to all attributes
 for attribute in ATTRIBUTES_DICT.keys():
-    if 0 not in ATTRIBUTES_DICT[attribute]:
-        ATTRIBUTES_DICT[attribute][0] = 'missing data'
+    if 0 not in ATTRIBUTES_DICT[attribute] and 'unknown' not in ATTRIBUTES_DICT[attribute].values():
+        ATTRIBUTES_DICT[attribute][0] = 'unknown'
 
 # Change 'IGUN_MEKUBAZ' key to 'STATUS_IGUN'
 ATTRIBUTES_DICT['STATUS_IGUN'] = ATTRIBUTES_DICT.pop('IGUN_MEKUBAZ')
