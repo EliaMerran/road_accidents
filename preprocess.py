@@ -14,8 +14,15 @@ def preprocess(data, start_year, end_year, train_interval, save_path=None):
         test_start = train_end + 1
         test_end = test_start
         train_data, test_data = cluster_frame(data, train_start, train_end, test_start, test_end)
-
+        train = gpd.GeoDataFrame(train_data["X Y cluster".split()],
+                                 geometry=gpd.points_from_xy(train_data.X, train_data.Y, crs="EPSG:2039"))
         df_clusters = train_data.groupby(['cluster']).size().reset_index(name='size')
+        # add polygon of accidents in cluster
+        df_clusters = df_clusters.merge(
+            train.dissolve(by='cluster').drop(columns=['X', 'Y']),
+            how='left',
+            on='cluster'
+        )
         df_clusters = df_clusters[df_clusters['size'] >= config.MIN_CLUSTER_SIZE]
         df_clusters = add_severe_count(df_clusters, train_data, 'train_severe')
         df_clusters = add_severe_count(df_clusters, test_data, 'test_severe')
@@ -51,8 +58,6 @@ def cluster_frame(frame, train_start, train_end, test_start, test_end, cluster_e
     test = gpd.sjoin_nearest(test, train, how="left", distance_col="dist", lsuffix="test", rsuffix="train",
                              max_distance=test_eps)
     test = test.reset_index().drop_duplicates(subset="pk_teuna_fikt").set_index("pk_teuna_fikt")
-
-    # TODO: add polygon of all points to a cluster with dissolve
 
     # assert test["dist"].max() <= test_eps
 
