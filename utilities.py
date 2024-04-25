@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-
+import json
 import config
 
 
@@ -31,6 +31,7 @@ def get_accidents_data(save_path=None):
     without_injuries['HUMRAT_TEUNA'] = 4
     combined_df = pd.concat([with_injuries, without_injuries])
 
+
     # combined_df = combined_df.drop_duplicates(subset="pk_teuna_fikt").set_index("pk_teuna_fikt")
     combined_df = combined_df.drop_duplicates()
 
@@ -40,15 +41,19 @@ def get_accidents_data(save_path=None):
 
 
 def get_city_info(sort_by_population=True):
-    city_codes = pd.read_excel(r'data/raw data/city_codes.xlsx', engine='openpyxl')
+    city_codes = pd.read_excel(config.CITY_CODES_PATH, engine='openpyxl')
     if sort_by_population:
         city_codes.sort_values(by=['סך הכל אוכלוסייה 2021'], ascending=False, inplace=True)
     return city_codes
 
 
-def get_city_mapping(num_cities=config.NUM_CITIES):
+def get_city_mapping(num_cities=config.NUM_CITIES, save_path=None):
     city_info = get_city_info(sort_by_population=True)
     city_mapping = city_info[:num_cities].set_index('סמל יישוב')['שם יישוב באנגלית'].to_dict()
+    if save_path is not None:
+        # os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        with open(save_path, 'w') as json_file:
+            json.dump(city_mapping, json_file)
     return city_mapping
 
 
@@ -63,6 +68,20 @@ def get_cities_data(save_path=None):
     if save_path is not None:
         data_cities.to_csv(save_path)
     return data_cities
+
+
+def split_X_y(df):
+    X = df.drop(columns=['dangerous', 'test_year'])
+    y = df['dangerous'].astype(int)
+    return X, y
+
+
+def split_train_test(df, test_start= config.END_YEAR - config.TEST_INTERVAL + 1 , test_end= config.END_YEAR):
+    train_start = config.START_YEAR
+    train_end = test_start - 1
+    X_train, y_train = split_X_y(df[df.test_year.between(train_start, train_end)])
+    X_test, y_test = split_X_y(df[df.test_year.between(test_start, test_end)])
+    return X_train, y_train, X_test, y_test
 
 
 if __name__ == '__main__':

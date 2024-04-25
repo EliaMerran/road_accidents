@@ -43,7 +43,8 @@ def accident_statistics_by_city_table(data, city_mapping, output_path=None):
 # city, mean_accidents, mean_minor_accidents, mean_severe_accidents, num_clusters,
 # Consistent Severity, Improved Safety, Severe Turnaround, Stable Safety, severe_turnaround_probability	,
 # consistent_severe_probability, cluster size, average/std/min/max number of accidents per cluster (count)
-def accident_clusters_statistics_by_city_table(data, city_mapping, output_path=None):
+def accident_clusters_statistics_by_city_table(data, city_mapping, output_path=None,
+                                               min_cluster_size=config.MIN_CLUSTER_SIZE):
     attribute = 'RAMZOR'
     list_of_dfs = []
     for city_code, city_name in city_mapping.items():
@@ -67,7 +68,7 @@ def accident_clusters_statistics_by_city_table(data, city_mapping, output_path=N
                                                              test_start=test_start, test_end=test_end)
             city_train = city_train[city_train.cluster != -1]
             clusters = city_train.groupby('cluster').size().reset_index(name='count')
-            clusters = clusters[clusters['count'] >= config.MIN_CLUSTER_SIZE]
+            clusters = clusters[clusters['count'] >= min_cluster_size]
             # clusters = clusters[clusters['cluster'] != -1]
             num_clusters.append(len(clusters))
             describe = clusters['count'].describe()
@@ -80,7 +81,7 @@ def accident_clusters_statistics_by_city_table(data, city_mapping, output_path=N
                                      geometry=gpd.points_from_xy(city_train.X, city_train.Y, crs="EPSG:2039"))
             cluster_size.append(train.dissolve(by='cluster').minimum_bounding_radius().mean())
             res = preprocess.get_clusters_by_attribute(city_train, city_test, attribute,
-                                                       config.ATTRIBUTES_DICT[attribute], config.MIN_CLUSTER_SIZE)
+                                                       config.ATTRIBUTES_DICT[attribute], min_cluster_size)
             df_grouped = res.groupby(['type']).size().reset_index(name='count')
             df_final = pd.concat([df_final, df_grouped.set_index('type').transpose()])
             df_final.fillna(0, inplace=True)
@@ -137,7 +138,7 @@ def accident_clusters_statistics_by_city_table(data, city_mapping, output_path=N
 
 # # creates a table of the following format:
 # (Exactly what you sent last week in attributes_clusters_summary_intervals.csv)
-def accident_clusters_statistics_by_attribute_table(data, output_path=None):
+def accident_clusters_statistics_by_attribute_table(data, output_path=None, min_cluster_size=config.MIN_CLUSTER_SIZE):
     list_of_dfs = []
     num_clusters_lst = []
     for train_start in range(config.START_YEAR, config.END_TRAIN_YEAR):
@@ -147,12 +148,12 @@ def accident_clusters_statistics_by_attribute_table(data, output_path=None):
         city_train, city_test = preprocess.cluster_frame(data, train_start=train_start, train_end=train_end,
                                                          test_start=test_start, test_end=test_end)
         clusters = city_train.groupby('cluster').size().reset_index(name='size')
-        clusters = clusters[clusters['size'] >= config.MIN_CLUSTER_SIZE]
+        clusters = clusters[clusters['size'] >= min_cluster_size]
         n_cluster = len(clusters[clusters['cluster'] != -1])
         num_clusters_lst.append(n_cluster)
         for attribute in config.ATTRIBUTES_DICT.keys():
             res = preprocess.get_clusters_by_attribute(city_train, city_test, attribute,
-                                                       config.ATTRIBUTES_DICT[attribute], config.MIN_CLUSTER_SIZE)
+                                                       config.ATTRIBUTES_DICT[attribute],min_cluster_size)
             # Accident Percentage
 
             df_per = res.groupby([f'{attribute}_majority_vote']).sum()
@@ -176,7 +177,7 @@ def accident_clusters_statistics_by_attribute_table(data, output_path=None):
                               inplace=True)
             df_grouped['attribute_majority_vote'] = df_grouped['attribute_majority_vote'].apply(
                 lambda x: f"{attribute} - {x}")
-            df_grouped['min_cluster_size'] = config.MIN_CLUSTER_SIZE
+            df_grouped['min_cluster_size'] = min_cluster_size
             df_grouped = df_grouped.pivot(index='attribute_majority_vote', columns='cluster_type',
                                           values='count').fillna(0).astype(int)
             cluster_count = df_grouped.sum(axis=1)
@@ -206,33 +207,37 @@ def accident_clusters_statistics_by_attribute_table(data, output_path=None):
     return result_df
 
 
-def outliers_percentage_table(data, output_path=None):
-    list_of_dfs = []
-    for train_start in range(config.START_YEAR, config.END_YEAR - config.TRAIN_INTERVAL + 1):
-        train_end = train_start + config.TRAIN_INTERVAL - 1
+def outliers_percentage_table(data, output_path=None, start_year=config.START_YEAR,
+                              end_year=config.END_YEAR, train_interval=config.TRAIN_INTERVAL,
+                              test_interval=config.TEST_INTERVAL):
+    list_of_dfs = {0:[],1: []}
+    for train_start in range(start_year, end_year - train_interval - test_interval + 2):
+        train_end = train_start + train_interval - 1
         test_start = train_end + 1
-        test_end = test_start
+        test_end = test_start + test_interval - 1
         train_data, test_data = preprocess.cluster_frame(data, train_start, train_end, test_start, test_end)
+        for i, data_set in enumerate([train_data, test_data]):
+            # Group by 'HUMRAT_TEUNA' and count the number of occurrences for each group
+            grouped_df = data_set.groupby('HUMRAT_TEUNA').size().reset_index(name='total_count')
 
-        # Group by 'HUMRAT_TEUNA' and count the number of occurrences for each group
-        grouped_df = train_data.groupby('HUMRAT_TEUNA').size().reset_index(name='total_count')
+            # Filter the DataFrame for rows where 'cluster' is equal to -1
+            outliers = data_set[data_set['cluster'] == -1]
+            print("i", i, outliers.shape[0])
+            # Group by 'HUMRAT_TEUNA' in the cluster -1 DataFrame and count the number of occurrences for each group
+            outliers_grouped = outliers.groupby('HUMRAT_TEUNA').size().reset_index(name='outliers_count')
 
-        # Filter the DataFrame for rows where 'cluster' is equal to -1
-        outliers = train_data[train_data['cluster'] == -1]
+            # Merge the two DataFrames based on 'HUMRAT_TEUNA'
+            merged_df = pd.merge(grouped_df, outliers_grouped, on='HUMRAT_TEUNA', how='left')
 
-        # Group by 'HUMRAT_TEUNA' in the cluster -1 DataFrame and count the number of occurrences for each group
-        outliers_grouped = outliers.groupby('HUMRAT_TEUNA').size().reset_index(name='outliers_count')
+            # Fill NaN values with 0 (for cases where there are no accidents in cluster -1 for a specific 'HUMRAT_TEUNA')
+            merged_df['outliers_count'].fillna(0, inplace=True)
 
-        # Merge the two DataFrames based on 'HUMRAT_TEUNA'
-        merged_df = pd.merge(grouped_df, outliers_grouped, on='HUMRAT_TEUNA', how='left')
-
-        # Fill NaN values with 0 (for cases where there are no accidents in cluster -1 for a specific 'HUMRAT_TEUNA')
-        merged_df['outliers_count'].fillna(0, inplace=True)
-
-        # Calculate the percentage for each 'HUMRAT_TEUNA'
-        merged_df['percentage_outliers'] = (merged_df['outliers_count'] / merged_df['total_count']) * 100
-        list_of_dfs.append(merged_df)
-    result_df = pd.concat(list_of_dfs).groupby('HUMRAT_TEUNA', as_index=False).mean()
+            # Calculate the percentage for each 'HUMRAT_TEUNA'
+            merged_df['percentage_outliers'] = (merged_df['outliers_count'] / merged_df['total_count']) * 100
+            list_of_dfs[i].append(merged_df)
+    train_df = pd.concat(list_of_dfs[0]).groupby('HUMRAT_TEUNA', as_index=False).mean()
+    test_df = pd.concat(list_of_dfs[1]).groupby('HUMRAT_TEUNA', as_index=False).mean()
+    result_df = pd.merge(train_df, test_df, on='HUMRAT_TEUNA', suffixes=('_train', '_test'))
     if output_path:
         result_df.to_csv(output_path, index=False)
     return result_df
@@ -248,7 +253,8 @@ def location_accuracy_statistics(data, city_mapping, output_path=None):
 
 
 if __name__ == '__main__':
-    data_cities = utilities.get_cities_data()
+    # data_cities = utilities.get_cities_data()
+    data_cities = pd.read_csv('data/processed data/cities_accidents.csv', index_col='pk_teuna_fikt')
     city_mapping = utilities.get_city_mapping()
     accident_statistics_by_city_table(data_cities, city_mapping,
                                       output_path='data/theoretical overview/accident_statistics_by_city.csv')
@@ -261,5 +267,3 @@ if __name__ == '__main__':
     outliers_percentage_table(data_cities, output_path='data/theoretical overview/outliers_percentage.csv')
     data = utilities.get_accidents_data()
     location_accuracy_statistics(data,city_mapping, output_path='data/theoretical overview/location_accuracy.csv')
-    # data_cities = pd.read_csv('data/processed data/cities_accidents.csv', index_col='pk_teuna_fikt')
-    # accident_clusters_statistics_by_city_table(data_cities, city_mapping, output_path='try.csv')

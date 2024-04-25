@@ -1,63 +1,52 @@
-from sklearn.metrics import mean_squared_error
-from sklearn.preprocessing import OrdinalEncoder
-
-import config
-import preprocess
 import utilities
-import xgboost as xgb
+import preprocess
+import config
+
 import numpy as np
+import xgboost as xgb
+import pandas as pd
+from dbscan_hyperparameter_tuning import calculate_param_from_accidents_density
 
 
-def split_X_y(df):
-    X = df.drop(columns=['type', 'train_start'])
-    y = df['type']
-    return X, y
-
-
-if __name__ == '__main__':
-    # Load data
-    data = utilities.get_cities_data()
-    # Preprocess data
-    data = preprocess.preprocess(data, start_year=config.START_YEAR, end_year=config.END_YEAR,
-                                 train_interval=config.TRAIN_INTERVAL)
-    data = data.drop(columns=['cluster', 'geometry', 'test_severe'])
+def prediction_model(data, city_mapping, city_attributes, test_start, test_end, min_samp_formula=None,
+                     min_samp_args=None, eps_formula=None, eps_args=None):
+    list_of_df = []
+    for city_code, city_name in city_mapping.items():
+        city_data = data[data['SEMEL_YISHUV'] == city_code]
+        min_samp = config.MIN_SAMPLES
+        eps = config.EPS
+        if min_samp_formula:
+            min_samp = round(calculate_param_from_accidents_density(data, city_attributes, city_name, city_code,
+                                                              min_samp_formula, *min_samp_args))
+            if min_samp < 2:
+                min_samp = 2
+        if eps_formula:
+            eps = calculate_param_from_accidents_density(data, city_attributes, city_name, city_code,
+                                                         eps_formula, *eps_args)
+            if eps < 1:
+                eps = 1
+        clusters_data = preprocess.preprocess(city_data, start_year=config.START_YEAR, end_year=config.END_YEAR,
+                                              train_interval=config.TRAIN_INTERVAL, test_interval=config.TEST_INTERVAL,
+                                              min_samp=min_samp, min_cluster_size=1, cluster_eps=eps, test_eps=eps)
+        processes_data = clusters_data.drop(columns=config.DROP_COLUMNS)
+        list_of_df.append(processes_data)
+    processes_data = pd.concat(list_of_df)
     # Extract text features
-    cats = data.select_dtypes(exclude=np.number).columns.tolist()
+    cats = processes_data.select_dtypes(exclude=np.number).columns.tolist()
 
     # Convert to Pandas category
     for col in cats:
-        data[col] = data[col].astype('category')
+        processes_data[col] = processes_data[col].astype('category')
 
     # Split data
-    X_test, y_test = split_X_y(data[data.train_start.between(2015, 2016)])
-    X_val, y_val = split_X_y(data[data.train_start.between(2014, 2014)])
-    X_train, y_train = split_X_y(data[data.train_start.between(2008, 2013)])
+    X_train, y_train, X_test, y_test = utilities.split_train_test(processes_data, test_start, test_end)
 
-    # y_test_encoded = OrdinalEncoder().fit_transform(y_test)
-    # y_val_encoded = OrdinalEncoder().fit_transform(y_val)
-    # y_train_encoded = OrdinalEncoder().fit_transform(y_train)
-    #
-    #
-    # # Fit model
-    # # Create regression matrices
-    # dtrain_reg = xgb.DMatrix(X_train, y_train_encoded, enable_categorical=True)
-    # dtest_reg = xgb.DMatrix(X_val, y_val_encoded, enable_categorical=True)
-    #
-    # # Define hyperparameters
-    # params = {"objective": "multi:softprob", "tree_method": "gpu_hist"}
-    #
-    # n = 100
-    # model = xgb.train(
-    #     params=params,
-    #     dtrain=dtrain_reg,
-    #     num_boost_round=n,
-    # )
-    # # Evaluate model
-    # preds = model.predict(dtest_reg)
-    # rmse = mean_squared_error(y_test, preds, squared=False)
-    #
-    # print(f"RMSE of the base model: {rmse:.3f}")
+    # Fit model
+    xgb_classifier = xgb.XGBClassifier(n_estimators=config.NUM_ESTIMATORS, objective='binary:logistic',
+                                       tree_method='hist', max_depth=config.MAX_DEPTH, enable_categorical=True,
+                                       random_state=config.RANDOM_STATE)
+    xgb_classifier.fit(X_train, y_train)
+    return xgb_classifier, X_test, y_test
 
-    # Plot results
-
-    # Save results
+if __name__ == '__main__':
+    pass
