@@ -1,0 +1,176 @@
+﻿,name hebrew,name,var,code,value hebrew ,value
+0,תחום גאוגרפי,Geographical region,THUM_GEOGRAFI,1,ישראל ללא יהודה ושומרון,Israel wo occupied territories
+1,,,THUM_GEOGRAFI,2,יהודה והשומרון,occupied territories
+2,סוג דרך,Type of road ,SUG_DEREH,1,עירוני בצומת,urban intersection
+3,,,SUG_DEREH,2,עירוני לא בצומת,urban non intersection
+4,,,SUG_DEREH,3,לא עירוני בצומת,non urban intersection
+5,,,SUG_DEREH,4,לא עירוני לא בצומת,non urban non intersection
+6,יחידה משטרתית,Police unit ,YEHIDA,11,מרחב חוף (חיפה),hof unit
+7,,,YEHIDA,12,מרחב גליל,galil unit
+8,,,YEHIDA,14,מרחב עמקים,amakim unit 
+9,,,YEHIDA,20,"מרחב ת""א",tel aviv unit
+10,,,YEHIDA,33,מרחב אילת,eilat unit
+11,,,YEHIDA,34,מרחב הנגב,negev unit
+12,,,YEHIDA,36,מרחב שמשון (עד 1999),shimshon unit (until 1999)
+13,,,YEHIDA,37,מרחב שמשון (החל ב-2004),shimshon unit (from 2004)
+14,,,YEHIDA,38,מרחב לכיש,lakish unit
+15,,,YEHIDA,41,מרחב שומרון,shomron unit
+16,,,YEHIDA,43,מרחב יהודה,yehuda unit
+17,,,YEHIDA,51,מרחב השרון,sharon unit
+18,,,YEHIDA,52,מרחב השפלה,shfela unit
+19,,,YEHIDA,61,מחוז ירושלים,jerusalem unit
+20,סוג יום,Day,SUG_YOM,1,חג,holiday
+21,,,SUG_YOM,2,ערב חג,holiday eve
+22,,,SUG_YOM,3,חול המועד,semi-holiday
+23,,,SUG_YOM,4,יום אחר,other day
+24,יום/לילה,Day/Night,YOM_LAYLA,1,יום,day
+25,,,YOM_LAYLA,5,לילה,night
+26,יום בשבוע,Day of week,YOM_BASHAVUA,1,ראשון,Sunday
+27,,,YOM_BASHAVUA,2,שני,Monday
+28,,,YOM_BASHAVUA,3,שלישי,Tuesday
+29,,,YOM_BASHAVUA,4,רביעי,Wednesday
+30,,,YOM_BASHAVUA,5,חמישי,Thursday
+31,,,YOM_BASHAVUA,6,שישי,Friday
+32,,,YOM_BASHAVUA,7,שבת,Saturday
+33,מרומזר/לא מרומזר,Traffic light ,RAMZOR,0,לא,no
+34,,,RAMZOR,1,כן,yes
+35,,,RAMZOR,9,לא ידוע,unknown
+36,חומרת התאונה,Accident severity ,HUMRAT_TEUNA,1,קטלנית ,deadly
+37,,,HUMRAT_TEUNA,2,קשה,severe
+38,,,HUMRAT_TEUNA,3,קלה,light
+39,סוג תאונה,Accident type ,SUG_TEUNA,1,פגיעה בהולך רגל,pedestrian impact 
+40,,,SUG_TEUNA,2,התנגשות חזית אל צד,front to side 
+41,,,SUG_TEUNA,3,התנגשות חזית באחור,front to back
+42,,,SUG_TEUNA,4,התנגשות צד בצד,side to side
+43,,,SUG_TEUNA,5,התנגשות חזית אל חזית,front to front
+44,,,SUG_TEUNA,6,התנגשות עם רכב שנעצר ללא חניה,impact with unparked stoped vehicle 
+45,,,SUG_TEUNA,7,התנגשות עם רכב חונה,impact with parked vehicle 
+46,,,SUG_TEUNA,8,התנגשות עם עצם דומם,impact with object 
+47,,,SUG_TEUNA,9,ירידה מהכביש או עלייה למדרכה,went offroad to on sidewalk
+48,,,SUG_TEUNA,10,התהפכות,flipped over 
+49,,,SUG_TEUNA,11,החלקה,slipped
+50,,,SUG_TEUNA,12,פגיעה בנוסע בתוך כלי רכב,individual inside car hit 
+51,,,SUG_TEUNA,13,נפילה ברכב נע,falling from moving vehicle 
+52,,,SUG_TEUNA,14,שריפה,fire 
+53,,,SUG_TEUNA,15,אחר,other 
+54,,,SUG_TEUNA,17,התנגשות אחור אל חזית,back to front 
+55,,,SUG_TEUNA,18,התנגשות אחור אל צד,back to side
+56,,,SUG_TEUNA,19,התנגשות עם בעל חיים,impact with animal
+57,,,SUG_TEUNA,20,פגיעה ממטען של רכב,impact with cargo from other vehicle
+58,צורת הדרך,Road property,ZURAT_DEREH,1,כניסה למחלף,entering interchange 
+59,,,ZURAT_DEREH,2,ביציאה ממחלף,exit interchange
+60,,,ZURAT_DEREH,3,מ.חניה/ת. דלק,gas station or parking lot 
+61,,,ZURAT_DEREH,4,שיפוע תלול,steep incline 
+62,,,ZURAT_DEREH,5,עקום חד,hard turn 
+63,,,ZURAT_DEREH,6,על גשר מנהרה,bridge 
+64,,,ZURAT_DEREH,7,מפגש מסילת ברזל,railroad intersection 
+65,,,ZURAT_DEREH,8,כביש ישר/צומת,road or intersection 
+66,,,ZURAT_DEREH,9,אחר,other 
+67,,,ZURAT_DEREH,10,תחנת אוטובוס,bus stop 
+68,,,ZURAT_DEREH,,נתיב תחבורה ציבורית,bus lane 
+69,"דרך חד מסלולית (חלופה ל""דרך רב מסלולית"")",Single lane,HAD_MASLUL,1,חד סיטרי,one way road 
+70,,,HAD_MASLUL,2,דו סיטרי+קו הפרדה רצוף,two way no bypass 
+71,,,HAD_MASLUL,3,דו סיטרי אין קו הפרדה רצוף,two way yes bypass 
+72,,,HAD_MASLUL,4,אחר,other 
+73,,,HAD_MASLUL,9,לא ידוע מספר מסלולים,unknown number of lanes 
+74,"דרך רב מסלולית (חלופה ל""דרך חד מסלולית"")",Multiple lane ,RAV_MASLUL,1,מיפרדה מסומנת בצבע,painted divider 
+75,,,RAV_MASLUL,2,מיפרדה עם גדר בטיחות,fenced divider 
+76,,,RAV_MASLUL,3,מיפרדה בנויה ללא גדר בטיחות,built divider no fence 
+77,,,RAV_MASLUL,4,מיפרדה לא בנויה,unbuilt divier 
+78,,,RAV_MASLUL,5,אחר,other 
+79,מהירות מותרת,Speed limit,MEHIRUT_MUTERET,0,לא ידוע,unknown
+80,,,MEHIRUT_MUTERET,1,"עד 50 קמ""ש",upto 50 km/h
+81,,,MEHIRUT_MUTERET,2,"60 קמ""ש",60
+82,,,MEHIRUT_MUTERET,3,"70 קמ""ש",70
+83,,,MEHIRUT_MUTERET,4,"80 קמ""ש",80
+84,,,MEHIRUT_MUTERET,5,"90 קמ""ש",90
+85,,,MEHIRUT_MUTERET,6,"100 קמ""ש",100
+86,,,MEHIRUT_MUTERET,7,"110 קמ""ש",110
+87,תקינות הדרך,Road deficiency,TKINUT,0,לא ידוע,unknown
+88,,,TKINUT,1,אין ליקוי,no deficiency
+89,,,TKINUT,2,שוליים גרועים,bad shoulders
+90,,,TKINUT,3,כביש משובש,bad road
+91,,,TKINUT,4,שוליים גרועים וכביש משובש,bad shoulders and road
+92,רוחב הכביש,Road width,ROHAV,0,לא ידוע,unknown
+93,,,ROHAV,1,עד 5 מטר,up to 5 meters 
+94,,,ROHAV,2,5 עד 7,5 to 7 meters 
+95,,,ROHAV,3,7 עד 10.5,7 to10.5 meters
+96,,,ROHAV,4,10.5 עד 14,10.5 to 14 meters 
+97,,,ROHAV,5,יותר מ-14,above 14 metesr 
+98,סימון/תימרור,Signs and markings,SIMUN_TIMRUR,1,סימון לקוי/חסר,bad or missing markings 
+99,,,SIMUN_TIMRUR,2,תימרור לקוי/חסר,bad or missing signs 
+100,,,SIMUN_TIMRUR,3,אין ליקוי,no deficiency
+101,,,SIMUN_TIMRUR,4,לא נדרש תמרור,no signs needed
+102,,,SIMUN_TIMRUR,5,לא ידוע,unknown
+103,תאורה,Lighting ,TEURA,1,אור יום רגיל,regular daylight
+104,,,TEURA,2,"ראות מוגבלת עקב מזג אויר (עשן,ערפל)","limited visibility due to weather (smoke, mist)"
+105,,,TEURA,3,לילה פעלה תאורה,"night, lights on"
+106,,,TEURA,4,קיימת תאורה בלתי תקינה/לא פועלת,partial or no light
+107,,,TEURA,5,לילה לא קיימת תאורה,"night, no light"
+108,,,TEURA,6,לילה לא ידוע,"night, unknown light"
+109,,,TEURA,7,לילה תאורה תקינה עם ראות מוגבלת,"night, lights on, limited visibility"
+110,,,TEURA,8,לילה תאורה לא תקינה עם ראות מוגבלת,"night, lights not working, limited visibility"
+111,,,TEURA,9,לילה ללא תאורה  עם ראות מוגבלת,"night, lights off, limited visibility"
+112,,,TEURA,10,דמדומים,twilight
+113,,,TEURA,11,יום לא ידוע,day unknown
+114,בקרה בצומת (קיים,Intersection control,BAKARA,1,אין בקרה,none
+115,"רק בסוג דרך 1,3)",,BAKARA,2,רמזור תקין,working traffic light
+116,,,BAKARA,3,רמזור מהבהב צהוב,yellow blink traffic light
+117,,,BAKARA,4,רמזור לא תקין,traffic light not working 
+118,,,BAKARA,5,תמרור עצור,stop sign
+119,,,BAKARA,6,תמרור זכות קדימה,give way
+120,,,BAKARA,7,אחר,other 
+121,מזג אויר,Weather ,MEZEG_AVIR,1,בהיר,clear
+122,,,MEZEG_AVIR,2,גשום,rainy
+123,,,MEZEG_AVIR,3,שרבי,haze
+124,,,MEZEG_AVIR,4,ערפילי,mist
+125,,,MEZEG_AVIR,5,אחר,other 
+126,,,MEZEG_AVIR,9,לא ידוע,unknown
+127,מצב פני הכביש,Road surface condition,PNE_KVISH,1,יבש,dry
+128,,,PNE_KVISH,2,רטוב ממים,wet from water 
+129,,,PNE_KVISH,3,מרוח בחומר דלק,fuel on road
+130,,,PNE_KVISH,4,מכוסה בבוץ,mud on road
+131,,,PNE_KVISH,5,חול או חצץ על הכביש,sand or gravel on road
+132,,,PNE_KVISH,6,אחר,other
+133,,,PNE_KVISH,9,לא ידוע,unknown
+134,סוג העצם (רק בסוג תאונה 8),Object type ,SUG_EZEM,1,עץ,tree
+135,,,SUG_EZEM,2,עמוד חשמל/תאורה/טלפון,post
+136,,,SUG_EZEM,3,תמרור ושלט,sign post 
+137,,,SUG_EZEM,4,גשר סימניו ומגיניו,bridge structure 
+138,,,SUG_EZEM,5,מבנה,structure 
+139,,,SUG_EZEM,6,גדר בטיחות לרכב,safety fence 
+140,,,SUG_EZEM,7,חבית,barrel 
+141,,,SUG_EZEM,8,אחר,other 
+142,,,SUG_EZEM,9,לא ידוע,unknown
+143,מרחק העצם (רק בסוג תאונה 8),Objevt distance ,MERHAK_EZEM,1,עד מטר,up to 1 meter 
+144,,,MERHAK_EZEM,2,1-3 מטר,1-3 meters 
+145,,,MERHAK_EZEM,3,על הכביש,on the road 
+146,,,MERHAK_EZEM,4,על שטח הפרדה,on seperator 
+147,,,MERHAK_EZEM,9,לא ידוע,unknown
+148,"לא חצה (רק בסוג תאונה1, חלופה ל""אופן חצייה"")",Pedestrian non-crossing behavior,LO_HAZA,1,הלך בכיוון התנועה,walked in the direction of traffic 
+149,,,LO_HAZA,2,הלך נגד,walked against traffic 
+150,,,LO_HAZA,3,שיחק על הכביש,play on the road 
+151,,,LO_HAZA,4,עמד על הכביש,stad on the road 
+152,,,LO_HAZA,5,היה על אי הפרדה,was on divider 
+153,,,LO_HAZA,6,היה על שוליים/מדרכה,was on shoulder or sidewalk
+154,,,LO_HAZA,7,אחר,other 
+155,,,LO_HAZA,9,לא ידוע,unknown
+156,"אופן חציה (רק בסוג תאונה1, חלופה ל""לא חצה"")",Pedestrian crossing behavior,OFEN_HAZIYA,1,התפרץ אל הכביש,jumped into road
+157,,,OFEN_HAZIYA,2,חצה שהוא מוסתר,crossed invisibly 
+158,,,OFEN_HAZIYA,3,חצה רגיל,crossed 
+159,,,OFEN_HAZIYA,4,אחר,other 
+160,,,OFEN_HAZIYA,8,לא חצה,did not cross 
+161,,,OFEN_HAZIYA,9,לא ידוע עם חצה,unknown crossing status 
+162,מקום חציה (רק בסוג תאונה 1),Crossing location,MEKOM_HAZIYA,1,לא במעבר חציה ליד צומת,near intersection not zebra crossing 
+163,,,MEKOM_HAZIYA,2,לא במעבר חציה לא ליד צומת,not near intersection not zebra 
+164,,,MEKOM_HAZIYA,3,במעבר חציה בלי רמזור,zebra crossing no traffic light 
+165,,,MEKOM_HAZIYA,4,במעבר חציה עם רמזור,zebra crossign with traffic light 
+166,,,MEKOM_HAZIYA,9,לא ידוע מקום חציה,unknown crossing point 
+167,כיוון חציה (רק בסוג תאונה 1),Crossing direction,KIVUN_HAZIYA,1,מימין לשמאל,from right to left 
+168,,,KIVUN_HAZIYA,2,משמאל לימין,from left to right 
+169,,,KIVUN_HAZIYA,9,לא ידוע,unknown
+170,איכות עיגון,Location quality ,IGUN_MEKUBAZ,1,עיגון מדויק,exact location 
+171,,,IGUN_MEKUBAZ,2,מרכז ישוב,center of town 
+172,,,IGUN_MEKUBAZ,3,מרכז דרך,center of road 
+173,,,IGUN_MEKUBAZ,4,מרכז קילומטר,center of kilometer 
+174,,,IGUN_MEKUBAZ,9,לא עוגן,was not located 
