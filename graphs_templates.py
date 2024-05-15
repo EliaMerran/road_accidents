@@ -4,15 +4,19 @@ from sklearn.metrics import confusion_matrix
 import plotly.subplots as sp
 
 
+def save_plot(fig, save_path, title):
+    modified_title = ''.join(c if c.isalpha() else '_' for c in title)
+    fig.write_image(save_path + modified_title + '.png')
+    fig.write_html(save_path + modified_title + '.html')
+
+
 def plot_roc_curve(df, color_feature, title='ROC Curve', show=True, save_path=None):
     fig = px.line(df, x='fpr', y='tpr', title=title,
                   color=color_feature, hover_data=['thresholds'], labels={'fpr': 'FPR', 'tpr': 'TPR'})
     if show:
         fig.show()
     if save_path:
-        modified_title = ''.join(c if c.isalpha() else '_' for c in title)
-        fig.write_image(save_path + f'roc_curve_{modified_title}.png')
-        fig.write_html(save_path + f'roc_curve_{modified_title}.html')
+        save_plot(fig, save_path, title)
     return fig
 
 
@@ -52,36 +56,24 @@ def plot_top_prediction_labels(X_test, y_test, xgb_classifier, threshold, minor_
     if show:
         fig.show()
     if save_path:
-        fig.write_image(save_path + f'Top of Predictions with Threshold {threshold}.png')
-        fig.write_html(save_path + f'Top of Predictions with Threshold {threshold}.html')
-
+        save_plot(fig, save_path, title)
     return fig
 
 
 def plot_multi_top_prediction_labels(figs, titles, title='Top Predictions', show=True, save_path=None):
     n_figs = len(figs)
-    # Create subplots
-    subplot = sp.make_subplots(rows=1, cols=n_figs, subplot_titles=titles, shared_xaxes=True, shared_yaxes=True)
-
+    fig = sp.make_subplots(rows=1, cols=n_figs, subplot_titles=titles, shared_xaxes=True, shared_yaxes=True)
     for i in range(n_figs):
-        subplot.add_trace(figs[i]['data'][0], row=1, col=i + 1)
-        subplot.add_trace(figs[i]['data'][1], row=1, col=i + 1)
-        subplot.add_trace(figs[i]['data'][2], row=1, col=i + 1)
-        subplot.add_trace(figs[i]['data'][3], row=1, col=i + 1)
-
-    # Update layout
-    subplot.update_layout(title_text=title)
-    # subplot.update_layout(
-    #     width=1000,  # Width of the figure in pixels
-    #     height=500  # Height of the figure in pixels
-    # )
-
+        fig.add_trace(figs[i]['data'][0], row=1, col=i + 1)
+        fig.add_trace(figs[i]['data'][1], row=1, col=i + 1)
+        fig.add_trace(figs[i]['data'][2], row=1, col=i + 1)
+        fig.add_trace(figs[i]['data'][3], row=1, col=i + 1)
+    fig.update_layout(title_text=title)
     if show:
-        subplot.show()
+        fig.show()
     if save_path:
-        subplot.write_image(save_path + 'tp_fp_vs_top_min_sample.png')
-        subplot.write_html(save_path + 'tp_fp_vs_top_min_sample.html')
-    return subplot
+        save_plot(fig, save_path, title)
+    return fig
 
 
 def plot_cluster_type_dist(df, title='Cluster Type Distribution', show=True, save_path=None):
@@ -93,27 +85,26 @@ def plot_cluster_type_dist(df, title='Cluster Type Distribution', show=True, sav
     if show:
         fig.show()
     if save_path:
-        fig.write_image(save_path + f'cluster_type_dist_{title}.png')
-        fig.write_html(save_path + f'cluster_type_dist_{title}.html')
+        save_plot(fig, save_path, title)
     return fig
 
 
-def plot_multi_cluster_type_dist(figs, titles, show=True, save_path=None):
-    subplot = sp.make_subplots(rows=1, cols=len(figs), subplot_titles=titles, specs=[[{'type': 'pie'}] * len(figs)])
+def plot_multi_cluster_type_dist(figs, titles, title='Multi Cluster Type Distribution',show=True, save_path=None):
+    fig = sp.make_subplots(rows=1, cols=len(figs), subplot_titles=titles, specs=[[{'type': 'pie'}] * len(figs)])
     # Add each pie chart to the subplot figure
     for i, data in enumerate(figs):
-        subplot.add_trace(data.data[0], row=1, col=i + 1)
-    subplot.update_layout(title_text='Accidents Type Distribution in Test Set')
-    subplot.update_layout(
+        fig.add_trace(data.data[0], row=1, col=i + 1)
+    fig.update_layout(title_text='Accidents Type Distribution in Test Set')
+    fig.update_layout(
         width=1000,  # Width of the figure in pixels
         height=500  # Height of the figure in pixels
     )
+    fig.update_layout(title_text=title)
     if show:
-        subplot.show()
+        fig.show()
     if save_path:
-        subplot.write_image(f'graphs/adaptive_dbscan/cluster_type_dist.png')
-        subplot.write_html(f'graphs/adaptive_dbscan/cluster_type_dist.html')
-    return subplot
+        save_plot(fig, save_path, title)
+    return fig
 
 
 def plot_accidents_by_attr_per_year(df, attribute, attribute_year_name, title='Accidents per Year', show=True,
@@ -124,6 +115,5 @@ def plot_accidents_by_attr_per_year(df, attribute, attribute_year_name, title='A
     if show:
         fig.show()
     if save_path:
-        fig.write_image(save_path + f'accidents_by_{attribute}_per_year.png')
-        fig.write_html(save_path + f'accidents_by_{attribute}_per_year.html')
+        save_plot(fig, save_path, title)
     return fig
