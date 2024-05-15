@@ -1,0 +1,25 @@
+{
+    "COUNTRY": "ISRAEL",
+    "START_YEAR": 2008,
+    "END_YEAR": 2019,
+    "DATA_PATH": "data/Israel/Accidents.csv",
+    "CODEBOOK_PATH": "data/Israel/Codebook.csv",
+    "CLUSTERS_DATA_PATH": "data/Israel/Clusters.csv",
+    "CITY_MAPPING_PATH": "data/Israel/city_mapping.json",
+    "CITY_DATA_PATH": "data/Israel/Accidents_cities.csv",
+    "CITY_CLUSTERS_DATA_PATH": "data/Israel/Clusters_cities.csv",
+    "MODEL_PATH": "models/israel_model.json",
+    "CITY_MODEL_PATH": "models/israel_city_model.json",
+
+    "CITY_CODES_PATH": "data/raw data/city_codes.xlsx",
+
+    "YEAR_FEATURE": "SHNAT_TEUNA",
+    "SEVERE_FEATURE": "HUMRAT_TEUNA",
+    "X_FEATURE": "X",
+    "Y_FEATURE": "Y",
+    "INDEX_FEATURE": "pk_teuna_fikt",
+    "CITY_FEATURE": "SEMEL_YISHUV",
+    "LOCATION_ACC_FEATURE": "STATUS_IGUN",
+
+    "CRS": "EPSG:2039"
+}

@@ -1,0 +1,23 @@
+{
+    "COUNTRY": "UK",
+    "START_YEAR": 1999,
+    "END_YEAR": 2019,
+
+    "DATA_PATH": "data/United Kingdom/Accidents.csv",
+    "CODEBOOK_PATH": "data/United Kingdom/Codebook.xlsx",
+    "CLUSTERS_DATA_PATH": "data/United Kingdom/Clusters.csv",
+    "CITY_MAPPING_PATH": "data/United Kingdom/city_mapping.json",
+    "CITY_DATA_PATH": "data/United Kingdom/Accidents_cities.csv",
+    "CITY_CLUSTERS_DATA_PATH": "data/United Kingdom/Clusters_cities.csv",
+    "MODEL_PATH": "models/uk_model.json",
+    "CITY_MODEL_PATH": "models/uk_city_model.json",
+
+    "YEAR_FEATURE": "accident_year",
+    "SEVERE_FEATURE": "accident_severity",
+    "X_FEATURE": "location_easting_osgr",
+    "Y_FEATURE": "location_northing_osgr",
+    "INDEX_FEATURE": "accident_index",
+    "CITY_FEATURE": "local_authority_district",
+
+    "CRS": "EPSG:27700"
+}

@@ -1,0 +1,15 @@
+{
+    "EPS": 30,
+    "MIN_SAMPLES": 3,
+    "MIN_CLUSTER_SIZE": 3,
+    "NUM_ESTIMATORS": 10,
+    "MAX_DEPTH": 2,
+    "THRESHOLD": 0.1,
+    "DBSCAN_TRAIN_INTERVAL": 5,
+    "DBSCAN_TEST_INTERVAL": 2,
+    "XGBOOST_TEST_START": 2018,
+    "XGBOOST_TEST_END": 2019,
+    "NUM_CITIES": 20,
+    "RANDOM_STATE": 42,
+    "DROP_COLUMNS": ["cluster", "geometry_x", "geometry_y", "type", "test_severe", "train_index", "test_index"]
+}

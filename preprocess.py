@@ -3,29 +3,37 @@ from sklearn.cluster import DBSCAN
 import numpy as np
 import pandas as pd
 
-import config
+# import config
 import utilities
 
 
-def preprocess(data, start_year=config.START_YEAR, end_year=config.END_YEAR, train_interval=config.TRAIN_INTERVAL,
-               test_interval = config.TEST_INTERVAL, save_path=None, min_cluster_size=config.MIN_CLUSTER_SIZE,
-               cluster_eps=config.EPS, test_eps=config.EPS, min_samp=config.MIN_SAMPLES ):
+def preprocess(data, config, save_path=None):
+    start_year = config["START_YEAR"]
+    end_year = config["END_YEAR"]
+    DBSCAN_TRAIN_INTERVAL = config["DBSCAN_TRAIN_INTERVAL"]
+    DBSCAN_TEST_INTERVAL = config["DBSCAN_TEST_INTERVAL"]
+    min_cluster_size = config["MIN_CLUSTER_SIZE"]
+    cluster_eps = config["EPS"]
+    test_eps = config["EPS"]  # Default to same as cluster_eps
+    min_samp = config["MIN_SAMPLES"]
+    crs = config["CRS"]
+
     list_of_dfs = []
-    # i = 0
-    for train_start in range(start_year, end_year - train_interval - test_interval + 2):
-        # i = i + 1
-        # print(i)
-        train_end = train_start + train_interval - 1
+    i = 0
+    for train_start in range(start_year, end_year - DBSCAN_TRAIN_INTERVAL - DBSCAN_TEST_INTERVAL + 2):
+        i = i + 1
+        print(i, train_start)
+        train_end = train_start + DBSCAN_TRAIN_INTERVAL - 1
         test_start = train_end + 1
-        test_end = test_start + test_interval - 1
-        train_data, test_data = cluster_frame(data, train_start, train_end, test_start, test_end, cluster_eps, test_eps,
-                                              min_samp)
-        train = gpd.GeoDataFrame(train_data["X Y cluster".split()],
-                                 geometry=gpd.points_from_xy(train_data.X, train_data.Y, crs="EPSG:2039"))
+        test_end = test_start + DBSCAN_TEST_INTERVAL - 1
+        train_data, test_data = cluster_frame(data, config, train_start, train_end, test_start, test_end)
+        train = gpd.GeoDataFrame(train_data[[config["X_FEATURE"], config["Y_FEATURE"], 'cluster']],
+                                 geometry=gpd.points_from_xy(train_data[config["X_FEATURE"]],
+                                                             train_data[config["Y_FEATURE"]], crs=crs))
         df_clusters = train_data.groupby(['cluster']).size().reset_index(name='size')
         # add polygon of train accidents in cluster
         df_clusters = df_clusters.merge(
-            train.dissolve(by='cluster').drop(columns=['X', 'Y']),
+            train.dissolve(by='cluster').drop(columns=[config["X_FEATURE"], config["Y_FEATURE"]]),
             how='left',
             on='cluster'
         )
@@ -34,10 +42,11 @@ def preprocess(data, start_year=config.START_YEAR, end_year=config.END_YEAR, tra
         df_clusters['train_index'] = df_clusters['cluster'].map(train_indices)
 
         # add polygon of test accidents in cluster
-        test = gpd.GeoDataFrame(test_data["X Y cluster".split()],
-                                 geometry=gpd.points_from_xy(test_data.X, test_data.Y, crs="EPSG:2039"))
+        test = gpd.GeoDataFrame(test_data[[config["X_FEATURE"], config["Y_FEATURE"], 'cluster']],
+                                geometry=gpd.points_from_xy(test_data[config["X_FEATURE"]],
+                                                            test_data[config["Y_FEATURE"]], crs=crs))
         df_clusters = df_clusters.merge(
-            test.dissolve(by='cluster').drop(columns=['X', 'Y']),
+            test.dissolve(by='cluster').drop(columns=[config["X_FEATURE"], config["Y_FEATURE"]]),
             how='left',
             on='cluster'
         )
@@ -47,13 +56,13 @@ def preprocess(data, start_year=config.START_YEAR, end_year=config.END_YEAR, tra
         # df_clusters['test_index'] = df_clusters['cluster'].map(test_indices)
 
         df_clusters = df_clusters[df_clusters['size'] >= min_cluster_size]
-        df_clusters = add_severe_count(df_clusters, train_data, 'train_severe')
-        df_clusters = add_severe_count(df_clusters, test_data, 'test_severe')
+        df_clusters = add_severe_count(df_clusters, config, train_data, 'train_severe')
+        df_clusters = add_severe_count(df_clusters, config, test_data, 'test_severe')
         df_clusters = df_clusters[df_clusters.cluster != -1]
         df_clusters = add_cluster_type(df_clusters)
-        for attribute in config.ATTRIBUTES_DICT.keys():
+        for attribute in config["ATTRIBUTE_DICT"].keys():
             attribute_df = get_clusters_by_attribute(train_data, test_data, attribute,
-                                                     config.ATTRIBUTES_DICT[attribute])
+                                                     config["ATTRIBUTE_DICT"][attribute], config)
             attribute_df = attribute_df[['cluster', f'{attribute}_majority_vote']]
             df_clusters = pd.merge(df_clusters, attribute_df, on='cluster', how='outer')
         df_clusters['cluster'] = str(test_start) + df_clusters['cluster'].astype(str)
@@ -72,22 +81,28 @@ def preprocess(data, start_year=config.START_YEAR, end_year=config.END_YEAR, tra
     return result_df
 
 
-def cluster_frame(frame, train_start, train_end, test_start, test_end, cluster_eps=config.EPS, test_eps=config.EPS,
-                  min_samp=config.MIN_SAMPLES):
-    train_data = frame[frame.SHNAT_TEUNA.between(train_start, train_end)].copy()
-    test_data = frame[frame.SHNAT_TEUNA.between(test_start, test_end)].copy()
+def cluster_frame(frame, config, train_start, train_end, test_start, test_end):
+    cluster_eps = config["EPS"]
+    test_eps = config["EPS"]
+    min_samp = config["MIN_SAMPLES"]
+    crs = config["CRS"]
+    train_data = frame[frame[config["YEAR_FEATURE"]].between(train_start, train_end)].copy()
+    test_data = frame[frame[config["YEAR_FEATURE"]].between(test_start, test_end)].copy()
 
-    clustering = DBSCAN(eps=cluster_eps, min_samples=min_samp).fit(train_data["X Y".split()])
+    clustering = DBSCAN(eps=cluster_eps, min_samples=min_samp).fit(
+        train_data[[config["X_FEATURE"], config["Y_FEATURE"]]])
     train_data["cluster"] = clustering.labels_
     train_clusters = train_data[train_data["cluster"] >= 0]  # un-clustered points are -1
 
     # Spatial join of test data to assign clusters to test data
-    test = gpd.GeoDataFrame(test_data["X Y".split()],
-                            geometry=gpd.points_from_xy(test_data.X, test_data.Y, crs="EPSG:2039"))
-    train = gpd.GeoDataFrame(train_clusters["X Y cluster".split()],
-                             geometry=gpd.points_from_xy(train_clusters.X, train_clusters.Y, crs="EPSG:2039"))
+    test = gpd.GeoDataFrame(test_data[[config["X_FEATURE"], config["Y_FEATURE"]]],
+                            geometry=gpd.points_from_xy(test_data[config["X_FEATURE"]], test_data[config["Y_FEATURE"]],
+                                                        crs=crs))
+    train = gpd.GeoDataFrame(train_clusters[[config["X_FEATURE"], config["Y_FEATURE"], "cluster"]],
+                             geometry=gpd.points_from_xy(train_clusters[config["X_FEATURE"]],
+                                                         train_clusters[config["Y_FEATURE"]], crs=crs))
     test = gpd.sjoin_nearest(test, train, how="left", distance_col="dist", lsuffix="test", rsuffix="train")
-    test = test.reset_index().drop_duplicates(subset="pk_teuna_fikt").set_index("pk_teuna_fikt")
+    test = test.reset_index().drop_duplicates(subset=config["INDEX_FEATURE"]).set_index(config["INDEX_FEATURE"])
 
     # assert test["dist"].max() <= test_eps
     # change cluster to -1 if dist > test_eps
@@ -96,43 +111,18 @@ def cluster_frame(frame, train_start, train_end, test_start, test_end, cluster_e
 
     return train_data, test_data
 
-# For all points as clusters
-# def cluster_frame(frame, train_start, train_end, test_start, test_end, cluster_eps=config.EPS, test_eps=config.EPS,
-#                   min_samp=config.MIN_SAMPLES):
-#     train_data = frame[frame.SHNAT_TEUNA.between(train_start, train_end)].copy()
-#     test_data = frame[frame.SHNAT_TEUNA.between(test_start, test_end)].copy()
-#
-#     train_data["cluster"] = list(range(len(train_data)))
-#     train_clusters = train_data[train_data["cluster"] >= 0]  # un-clustered points are -1
-#
-#     # Spatial join of test data to assign clusters to test data
-#     test = gpd.GeoDataFrame(test_data["X Y".split()],
-#                             geometry=gpd.points_from_xy(test_data.X, test_data.Y, crs="EPSG:2039"))
-#     train = gpd.GeoDataFrame(train_clusters["X Y cluster".split()],
-#                              geometry=gpd.points_from_xy(train_clusters.X, train_clusters.Y, crs="EPSG:2039"))
-#     test = gpd.sjoin_nearest(test, train, how="left", distance_col="dist", lsuffix="test", rsuffix="train",
-#                              max_distance=test_eps)
-#     test = test.reset_index().drop_duplicates(subset="pk_teuna_fikt").set_index("pk_teuna_fikt")
-#
-#     # assert test["dist"].max() <= test_eps
-#
-#     # change cluster to -1 if dist > test_eps
-#     test.loc[test["dist"] > test_eps, "cluster"] = -1
-#     test_data["cluster"] = test["cluster"]
-#
-#     return train_data, test_data
-
 
 def get_clusters_by_attribute(train_frame, test_frame, attribute, attribute_dict,
-                              min_cluster_size=config.MIN_CLUSTER_SIZE):
+                              config):
+    min_cluster_size = config["MIN_CLUSTER_SIZE"]
     df_counts = train_frame.groupby(['cluster', attribute]).size().reset_index(name='count')
     df_clusters = df_counts.pivot(index='cluster', columns=attribute, values='count').fillna(0).astype(int)
     df_clusters.reset_index(inplace=True)
     df_clusters.columns.name = None
     df_clusters['cluster_size'] = df_clusters.drop('cluster', axis=1).sum(axis=1)
     df_clusters = df_clusters[df_clusters['cluster_size'] >= min_cluster_size]
-    df_clusters = add_severe_count(df_clusters, train_frame, 'train_severe')
-    df_clusters = add_severe_count(df_clusters, test_frame, 'test_severe')
+    df_clusters = add_severe_count(df_clusters, config, train_frame, 'train_severe')
+    df_clusters = add_severe_count(df_clusters, config, test_frame, 'test_severe')
 
     df_clusters = add_cluster_type(df_clusters)
 
@@ -153,9 +143,9 @@ def get_clusters_by_attribute(train_frame, test_frame, attribute, attribute_dict
     return df_clusters
 
 
-def add_severe_count(df_clusters, frame, column_name):
+def add_severe_count(df_clusters, config, frame, column_name):
     df_clusters = df_clusters.merge(
-        frame[frame['HUMRAT_TEUNA'] < 3].groupby('cluster').size().reset_index(name=column_name),
+        frame[frame[config["SEVERE_FEATURE"]] < 3].groupby('cluster').size().reset_index(name=column_name),
         how='left',
         on='cluster'
     )
@@ -182,10 +172,18 @@ def add_cluster_type(df_clusters):
 
 
 if __name__ == '__main__':
-    # Load data
-    data = utilities.get_cities_data()
-    # Preprocess data
-    data = preprocess(data, start_year=config.START_YEAR, end_year=config.END_YEAR,
-                      train_interval=config.TRAIN_INTERVAL,
-                      save_path=f'data/processed data/clusters_{config.START_YEAR}_{config.END_YEAR}.csv')
+    # # Load config
+    # config = utilities.load_config(use_uk=True)
+    # # Load data
+    # data_israel = pd.read_csv(config["DATA_PATH"], index_col=config["INDEX_FEATURE"])
+    # data_israel = data_israel[data_israel.STATUS_IGUN == 1]
+    # attribute_dict = utilities.create_attribute_dict(config["COUNTRY"], config["CODEBOOK_PATH"])
+    # cluster = preprocess(data_israel, config, attribute_dict)
+    # print(cluster.head())
 
+    # Load config
+    config_my = utilities.load_config(use_uk=True)
+    # Load data
+    data_uk, attribute_dict_my = utilities.load_data(config_my)
+    clusters = preprocess(data_uk, config_my, attribute_dict_my)
+    print(clusters.head())
