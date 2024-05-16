@@ -28,7 +28,8 @@ def combine_data(directory, search_name, save_path=None):
 
 def get_accidents_data(save_path=None):
     with_injuries = combine_data('data/raw data/accidents with injuries 2005-2021/', 'accdata.csv')
-    without_injuries = combine_data('data/raw data/accidents without injuries 2005-2021/', 'accdata.csv')
+    without_injuries = combine_data('data/raw data/accidents without injuries 2005-2021/',
+                                    'accdata.csv')
     without_injuries['HUMRAT_TEUNA'] = 4
     combined_df = pd.concat([with_injuries, without_injuries])
     # combined_df = combined_df.drop_duplicates(subset="pk_teuna_fikt").set_index("pk_teuna_fikt")
