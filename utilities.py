@@ -57,11 +57,12 @@ def get_city_mapping(config, save_path=None):
     return city_mapping
 
 
-def get_cities_data(config, save_path=None):
-    data = get_accidents_data()
-    data = data[data.SHNAT_TEUNA.between(config["START_YEAR"], config.END_YEAR)]
+def get_cities_data(config, data=None, save_path=None):
+    if data is None:
+        data = get_accidents_data()
+    data = data[data.SHNAT_TEUNA.between(config["START_YEAR"], config["END_YEAR"])]
     city_info = get_city_info(config, sort_by_population=True)
-    city_mapping = city_info[:config.NUM_CITIES].set_index('סמל יישוב')['שם יישוב באנגלית'].to_dict()
+    city_mapping = city_info[:config["NUM_CITIES"]].set_index('סמל יישוב')['שם יישוב באנגלית'].to_dict()
     data_cities = data[data['SEMEL_YISHUV'].isin(city_mapping.keys())]
     data_cities = data_cities[data_cities.STATUS_IGUN == 1]
     data_cities['BAKARA'] = data_cities['BAKARA'].fillna(0)
@@ -189,6 +190,10 @@ def uk_cities_data(config, save_path=None):
 
 
 if __name__ == '__main__':
-    config = load_config(use_uk=True)
+    # Israel
+    config_israel = load_config(use_uk=False)
+    # save israel city mapping
+    get_city_mapping(config_israel, 'data/Israel/city_mapping.json')
+
     # save data
-    uk_cities_data(config,'data/United Kingdom/Accidents_cities.csv')
+    # uk_cities_data(config,'data/United Kingdom/Accidents_cities.csv')
