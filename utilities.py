@@ -1,4 +1,6 @@
 import os
+
+import numpy as np
 import pandas as pd
 import json
 
@@ -77,7 +79,19 @@ def split_X_y(df):
     return X, y
 
 
-def split_train_test(df, config):
+def prepare_clusters_data_for_xgboost(clusters_data, config):
+    clusters_data.drop(columns=config["DROP_COLUMNS"], inplace=True)
+    cats = clusters_data.select_dtypes(exclude=np.number).columns.tolist()
+
+    # Convert to Pandas category
+    for col in cats:
+        # print(col, clusters_data[col].dtype)
+        clusters_data[col] = clusters_data[col].astype('category')
+
+
+def split_train_test(clusters_data, config):
+    df = clusters_data.copy()
+    prepare_clusters_data_for_xgboost(df, config)
     test_start = config["XGBOOST_TEST_START"]
     test_end = config["XGBOOST_TEST_END"]
     train_start = config["START_YEAR"]
