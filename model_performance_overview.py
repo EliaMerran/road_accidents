@@ -17,13 +17,6 @@ def performance_overview(model_path, data, clusters, config, save_path, city=Fal
                                                      show=True,
                                                      save_path=save_path)
 
-    clusters_data.drop(columns=config["DROP_COLUMNS"], inplace=True)
-    cats = clusters_data.select_dtypes(exclude=np.number).columns.tolist()
-
-    # Convert to Pandas category
-    for col in cats:
-        # print(col, clusters_data[col].dtype)
-        clusters_data[col] = clusters_data[col].astype('category')
     X_train, y_train, X_test, y_test = utilities.split_train_test(clusters_data, config)
 
     # Load model from file
@@ -53,7 +46,7 @@ if __name__ == '__main__':
     for conf in configs:
         data = utilities.load_data(conf)
         cities_data = utilities.load_cities_data(conf)
-        my_clusters_data = pd.read_csv(conf["CITY_CLUSTERS_DATA_PATH"], index_col="Unnamed: 0")
+        my_clusters_data = pd.read_csv(conf["CITY_CLUSTERS_DATA_PATH"])
 
         for i in range(2):
             if i == 0:

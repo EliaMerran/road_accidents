@@ -8,19 +8,8 @@ import pandas as pd
 
 def train_model(data, config, save_path=None):
     clusters_data = preprocess.preprocess(data, config)
-    clusters_data.to_csv(config["CITY_CLUSTERS_DATA_PATH"])
-
-    processes_data = clusters_data.drop(columns=config["DROP_COLUMNS"])
-    # Extract text features
-    cats = processes_data.select_dtypes(exclude=np.number).columns.tolist()
-
-    # Convert to Pandas category
-    for col in cats:
-        processes_data[col] = processes_data[col].astype('category')
-
     # Split data
-    X_train, y_train, X_test, y_test = utilities.split_train_test(processes_data, config)
-
+    X_train, y_train, X_test, y_test = utilities.split_train_test(clusters_data, config)
     # Fit model
     xgb_classifier = xgb.XGBClassifier(n_estimators=config["NUM_ESTIMATORS"], objective='binary:logistic',
                                        tree_method='hist', max_depth=config["MAX_DEPTH"], enable_categorical=True,
