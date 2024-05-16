@@ -25,7 +25,6 @@ def performance_overview(model_path, data, clusters, config, save_path, city=Fal
         # print(col, clusters_data[col].dtype)
         clusters_data[col] = clusters_data[col].astype('category')
     X_train, y_train, X_test, y_test = utilities.split_train_test(clusters_data, config)
-    # Load model from file
 
     # Load model from file
     xgb_classifier = xgb.XGBClassifier()
@@ -37,7 +36,8 @@ def performance_overview(model_path, data, clusters, config, save_path, city=Fal
     # Calculate AUC
     auc = roc_auc_score(y_test, y_prob[:, 1])
     city_str = ' Cities' if city else ''
-    df = pd.DataFrame({'fpr': fpr, 'tpr': tpr, 'thresholds': thresholds, "country": config["COUNTRY"] + city_str, 'auc': auc})
+    df = pd.DataFrame({'fpr': fpr, 'tpr': tpr, 'thresholds': thresholds,
+                       "country": config["COUNTRY"] + city_str, 'auc': auc})
     graphs_templates.plot_roc_curve(df, title=f'ROC Curve {config["COUNTRY"]}', color_feature='country', show=True,
                                     save_path=save_path)
     return pred_fig, df
