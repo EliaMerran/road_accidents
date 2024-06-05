@@ -21,7 +21,7 @@ def plot_roc_curve(df, color_feature, title='ROC Curve', show=True, save_path=No
 
 
 def plot_top_prediction_labels(X_test, y_test, xgb_classifier, threshold, minor_only=False,
-                               title='Top Predictions', show=True, save_path=None):
+                               title='Top Predictions',show=True, save_path=None):
     X = X_test.copy()
     y = y_test.copy()
     if minor_only:
@@ -30,6 +30,7 @@ def plot_top_prediction_labels(X_test, y_test, xgb_classifier, threshold, minor_
     y_prob = xgb_classifier.predict_proba(X)
     y_pred = y_prob[:, 1] > threshold
     tp_lst, fp_lst, tn_lst, fn_lst = [], [], [], []
+    # my_range = range(10, len(y), 10)
     my_range = range(10, 100)
     for top in my_range:
         df_temp = pd.DataFrame({'y_prob': y_prob[:, 1], 'y_test': y, 'y_pred': y_pred})
