@@ -48,8 +48,7 @@ def get_city_info(config, sort_by_population=True):
     return city_codes
 
 
-def get_city_mapping(config, save_path=None):
-
+def get_israel_city_mapping(config, save_path=None):
     num_cities = config["NUM_CITIES"]
     city_info = get_city_info(config, sort_by_population=True)
     city_mapping = city_info[:num_cities].set_index('סמל יישוב')['שם יישוב באנגלית'].to_dict()
@@ -57,6 +56,13 @@ def get_city_mapping(config, save_path=None):
         # os.makedirs(os.path.dirname(save_path), exist_ok=True)
         with open(save_path, 'w') as json_file:
             json.dump(city_mapping, json_file)
+    return city_mapping
+
+
+def get_city_mapping(config):
+    # Load base configuration
+    with open(config['CITY_MAPPING_PATH']) as f:
+        city_mapping = json.load(f)
     return city_mapping
 
 
@@ -134,10 +140,10 @@ dft-road-casualty-statistics-road-safety-open-dataset-data-guide-2023.xlsx', sav
         var_df = df[df['field name'] == var_value]
         var_dict = dict(zip(var_df['code/format'], var_df['label']))
         attribute_dict[var_value] = var_dict
-    del_keys = ['legacy_collision_severity', 'did_police_officer_attend_scene_of_collision']
+    del_keys = ['legacy_collision_severity', 'did_police_officer_attend_scene_of_collision', 'date', 'time',
+                'first_road_number', 'speed_limit', 'second_road_number', 'special_conditions_at_site']
     for key in del_keys:
         attribute_dict.pop(key)
-    # attribute_dict['HUMRAT_TEUNA'] = attribute_dict['accident_severity']
     if save_path is not None:
         with open(save_path, 'w') as json_file:
             json.dump(attribute_dict, json_file)
@@ -170,11 +176,12 @@ def load_config(use_uk=False):
     return config
 
 
-def load_data(config):
+def load_data(config, dropna=True):
     data = pd.read_csv(config["DATA_PATH"], index_col=config["INDEX_FEATURE"])
     if config["COUNTRY"] == "ISRAEL":
         data = data[data.STATUS_IGUN == 1]
-    data.dropna(subset=[config["X_FEATURE"], config["Y_FEATURE"]], inplace=True)
+    if dropna:
+        data.dropna(subset=[config["X_FEATURE"], config["Y_FEATURE"]], inplace=True)
     data = data[data[config["YEAR_FEATURE"]].between(config["START_YEAR"], config["END_YEAR"])]
     return data
 
@@ -208,7 +215,7 @@ if __name__ == '__main__':
     # Israel
     config_israel = load_config(use_uk=False)
     # save israel city mapping
-    get_city_mapping(config_israel, 'data/Israel/city_mapping.json')
+    get_israel_city_mapping(config_israel, 'data/Israel/city_mapping.json')
 
     # save data
     # uk_cities_data(config,'data/United Kingdom/Accidents_cities.csv')

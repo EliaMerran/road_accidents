@@ -1,6 +1,6 @@
 {
     "COUNTRY": "UK",
-    "START_YEAR": 1999,
+    "START_YEAR": 2008,
     "END_YEAR": 2019,
 
     "DATA_PATH": "data/United Kingdom/Accidents.csv",
