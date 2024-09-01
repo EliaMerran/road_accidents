@@ -1,5 +1,4 @@
 import os
-
 import numpy as np
 import pandas as pd
 import json
@@ -33,7 +32,6 @@ def get_accidents_data(with_damage_only=True, save_path=None):
                                         'accdata.csv')
         without_injuries['HUMRAT_TEUNA'] = 4
         combined_df = pd.concat([combined_df, without_injuries])
-    # combined_df = combined_df.drop_duplicates(subset="pk_teuna_fikt").set_index("pk_teuna_fikt")
     combined_df = combined_df.drop_duplicates()
 
     if save_path is not None:
@@ -54,7 +52,6 @@ def get_israel_city_mapping(config, save_path=None):
     city_info = get_city_info(config, sort_by_population=True)
     city_mapping = city_info[:num_cities].set_index('סמל יישוב')['שם יישוב באנגלית'].to_dict()
     if save_path is not None:
-        # os.makedirs(os.path.dirname(save_path), exist_ok=True)
         with open(save_path, 'w') as json_file:
             json.dump(city_mapping, json_file)
     return city_mapping
@@ -90,10 +87,8 @@ def split_X_y(df):
 def prepare_clusters_data_for_xgboost(clusters_data, config):
     clusters_data.drop(columns=config["DROP_COLUMNS"], inplace=True)
     cats = clusters_data.select_dtypes(exclude=np.number).columns.tolist()
-
     # Convert to Pandas category
     for col in cats:
-        # print(col, clusters_data[col].dtype)
         clusters_data[col] = clusters_data[col].astype('category')
 
 
@@ -198,28 +193,13 @@ def load_cities_data(config):
 
 def uk_cities_data(config, save_path=None):
     data = load_data(config)
-    # print data columns dtype
-    print(data.dtypes)
     # Load mapping
     with open("data/United Kingdom/city_mapping.json") as f:
         city_mapping = json.load(f)
     # turn keys to int
     city_mapping = {int(k): v for k, v in city_mapping.items()}
     cities_data = data[data['local_authority_district'].isin(city_mapping.keys())]
-    print(cities_data.head())
     if save_path is not None:
         cities_data.to_csv(save_path)
     return cities_data
 
-
-if __name__ == '__main__':
-    # Israel
-    config_israel = load_config(use_uk=False)
-    with_injuries = combine_data('data/raw data/accidents with injuries 2005-2021/', 'accdata.csv')
-    city_mapping = get_city_mapping(config=config_israel)
-    city_keys = list(map(int, city_mapping.keys()))
-    data = with_injuries[with_injuries[config_israel["CITY_FEATURE"]].isin(city_keys)]
-
-    with_injuries.to_csv('data/processed data/israel_cities_accidents_without_damage_only.csv')
-    # save data
-    # uk_cities_data(config,'data/United Kingdom/Accidents_cities.csv')

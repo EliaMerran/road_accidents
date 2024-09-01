@@ -7,6 +7,23 @@ import preprocess
 
 
 def accident_statistics_by_city_table(data, config, city_mapping, output_path=None):
+    """
+    Generates a table of accident counts by city, categorized by severity
+    (casualty, severe, light, property damage), and calculates the mean
+    number of accidents per year. Optionally saves the table as a CSV.
+    Generates a table of statistics by city, clustering the data in intervals for train years
+    and calculating statistics from these clusters.
+    Optionally saves the table as a CSV.
+
+        Args:
+            data (pd.DataFrame): Accident data.
+            config (dict): Configuration for model.
+            city_mapping (dict): Maps city codes to names.
+            output_path (str, optional): CSV save path.
+
+        Returns:
+            pd.DataFrame: Accident statistics by city.
+        """
     # Group and pivot data
     pivot = (
         data.groupby([config["CITY_FEATURE"], config["YEAR_FEATURE"], config["SEVERE_FEATURE"]])
@@ -40,48 +57,25 @@ def accident_statistics_by_city_table(data, config, city_mapping, output_path=No
     return pivot
 
 
-def israel_accident_statistics_by_city_table(data, config, city_mapping, output_path=None):
-    city_info = utilities.get_city_info(config=config, sort_by_population=True).head(config["NUM_CITIES"])
-    # Group and pivot data
-    pivot = (
-        data.groupby([config["CITY_FEATURE"], config["YEAR_FEATURE"], config["SEVERE_FEATURE"]])
-        .size()
-        .unstack(fill_value=0)
-        .reset_index()
-    )
-    # Mean over years
-    pivot = pivot.groupby(config["CITY_FEATURE"]).mean().reset_index()
-    # Map city names and calculate total accidents
-    pivot['city'] = pivot[config["CITY_FEATURE"]].map(city_mapping)
-    pivot['total_accidents'] = pivot[[1, 2, 3, 4]].sum(axis=1)
-    pivot['population'] = pivot[config["CITY_FEATURE"]].map(city_info.set_index('סמל יישוב')['סך הכל אוכלוסייה 2021'])
-
-    # Rearrange columns
-    column_order = ['city', 'population', 'total_accidents', 4, 3, 2, 1]
-    pivot = pivot[column_order]
-
-    # Rename columns
-    pivot.columns = ['city', 'population', 'total_accidents', 'property_damage', 'light', 'severe', 'casualty']
-    pivot = pivot.round(2)
-    # Save to CSV if requested
-    if output_path:
-        pivot.to_csv(output_path, index=False)
-    return pivot
-
-
-# creates a table of the following format:
-# city, mean_accidents, mean_minor_accidents, mean_severe_accidents, num_clusters,
-# Consistent Severity, Improved Safety, Severe Turnaround, Stable Safety, severe_turnaround_probability	,
-# consistent_severe_probability, cluster size, average/std/min/max number of accidents per cluster (count)
 def accident_clusters_statistics_by_city_table(data, config, output_path=None):
+    """
+    Generates a table of statistics by city, clustering the data in intervals for train years
+    and calculating statistics from these clusters.
+    Optionally saves the table as a CSV.
+
+        Args:
+            data (pd.DataFrame): Accident data.
+            config (dict): Clustering configuration.
+            output_path (str, optional): CSV save path.
+
+        Returns:
+            pd.DataFrame: Cluster statistics by city.
+        """
     min_cluster_size = config["MIN_CLUSTER_SIZE"]
     city_mapping = utilities.get_city_mapping(config=config)
-    # not the prettiest with the attribute usage, but it works
     attribute = config['SEVERE_FEATURE']
     list_of_dfs = []
-    print(city_mapping.items())
     for city_code, city_name in city_mapping.items():
-        print(city_name)
         city_data = data[data[config["CITY_FEATURE"]] == int(city_code)].copy()
         mean_accidents = city_data.groupby(config["YEAR_FEATURE"]).size().mean()
         mean_minor_accidents = city_data[city_data[config["SEVERE_FEATURE"]] >= 3].groupby(
@@ -96,14 +90,10 @@ def accident_clusters_statistics_by_city_table(data, config, output_path=None):
         max_cluster_count = []
         std_cluster_count = []
         df_final = pd.DataFrame()
-        # for train_start in range(config["START_YEAR"], config["END_TRAIN_YEAR"]):
-        #     train_end = train_start + config['DBSCAN_TRAIN_INTERVAL'] - 1
-        #     print(train_start, len(city_data[city_data[config["YEAR_FEATURE"]].between(train_start, train_end)]))
         for train_start in range(config["START_YEAR"], config["END_TRAIN_YEAR"]):
             train_end = train_start + config['DBSCAN_TRAIN_INTERVAL'] - 1
             test_start = train_end + 1
             test_end = test_start + config['DBSCAN_TEST_INTERVAL'] - 1
-            print(len(city_data[city_data[config["YEAR_FEATURE"]].between(train_start, train_end)]))
             city_train, city_test = preprocess.cluster_frame(frame=city_data, config=config, train_start=train_start,
                                                              train_end=train_end,
                                                              test_start=test_start, test_end=test_end)
@@ -180,9 +170,19 @@ def accident_clusters_statistics_by_city_table(data, config, output_path=None):
     return result_df
 
 
-# # creates a table of the following format:
-# (Exactly what you sent last week in attributes_clusters_summary_intervals.csv)
 def accident_clusters_statistics_by_attribute_table(data, config, output_path=None):
+    """
+       Creates a table of accident cluster statistics by attribute, showing
+       accident percentages, cluster counts, and trend probabilities. Saves as CSV optionally.
+
+       Args:
+           data (pd.DataFrame): Accident data.
+           config (dict): Clustering configuration.
+           output_path (str, optional): CSV save path.
+
+       Returns:
+           pd.DataFrame: Cluster statistics by attribute.
+       """
     min_cluster_size = config["MIN_CLUSTER_SIZE"]
     list_of_dfs = []
     num_clusters_lst = []
@@ -263,6 +263,18 @@ def accident_clusters_statistics_by_attribute_table(data, config, output_path=No
 
 
 def outliers_percentage_table(data, config, output_path=None):
+    """
+        Calculates the percentage of outlier clusters (-1 label) by severity
+        across different intervals. Optionally saves the results as a CSV.
+
+        Args:
+            data (pd.DataFrame): Accident data.
+            config (dict): Clustering configuration.
+            output_path (str, optional): CSV save path.
+
+        Returns:
+            pd.DataFrame: Outlier percentages by severity.
+        """
     start_year = config["START_YEAR"]
     end_year = config["END_YEAR"]
     train_interval = config["DBSCAN_TRAIN_INTERVAL"]
@@ -278,7 +290,6 @@ def outliers_percentage_table(data, config, output_path=None):
 
             # Filter the DataFrame for rows where 'cluster' is equal to -1
             outliers = data_set[data_set['cluster'] == -1]
-            print("i", i, outliers.shape[0])
             outliers_grouped = outliers.groupby(config["SEVERE_FEATURE"]).size().reset_index(name='outliers_count')
 
             merged_df = pd.merge(grouped_df, outliers_grouped, on=config["SEVERE_FEATURE"], how='left')
@@ -295,6 +306,19 @@ def outliers_percentage_table(data, config, output_path=None):
 
 
 def location_accuracy_statistics(config, with_damage_only=True,output_path=None):
+    """
+       Computes location accuracy statistics by severity, normalized by total accidents.
+       Filters data by damage if specified. Optionally saves as CSV.
+       Currently only available for Israel Data and is calculated on cities' data.
+
+       Args:
+           config (dict): Feature columns configuration.
+           with_damage_only (bool, optional): Include only accidents with damage. Default is True.
+           output_path (str, optional): CSV save path.
+
+       Returns:
+           pd.DataFrame: Location accuracy statistics by severity.
+       """
     data = utilities.get_accidents_data(with_damage_only=with_damage_only)
     # THIS IS ON 20 CITIES DATA
     city_mapping = utilities.get_city_mapping(config=config)
@@ -308,6 +332,18 @@ def location_accuracy_statistics(config, with_damage_only=True,output_path=None)
 
 
 def theoretical_overview(config, save_path):
+    """
+       Runs analyses on accident data, generating tables for city, cluster,
+       and attribute statistics, including outlier percentages. Saves results
+       based on configuration paths.
+
+       Args:
+           config (dict): Analysis configuration and paths.
+           save_path (str): Base path for saving outputs.
+
+       Returns:
+           None
+       """
     data_cities = utilities.load_cities_data(config=config)
     city_mapping = utilities.get_city_mapping(config=config)
     city_mapping = {int(k): v for k, v in city_mapping.items()}
@@ -325,6 +361,6 @@ def theoretical_overview(config, save_path):
 
 if __name__ == '__main__':
     israel_config = utilities.load_config()
-    theoretical_overview(israel_config, save_path='data/theoretical overview/3 1/israel without damage only/')
-    # uk_config = utilities.load_config(use_uk=True)
-    # theoretical_overview(uk_config, save_path='data/theoretical overview/uk/')
+    theoretical_overview(israel_config, save_path='data/theoretical overview/Israel/')
+    uk_config = utilities.load_config(use_uk=True)
+    theoretical_overview(uk_config, save_path='data/theoretical overview/United Kingdom/')

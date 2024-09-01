@@ -2,8 +2,6 @@ import geopandas as gpd
 from sklearn.cluster import DBSCAN
 import numpy as np
 import pandas as pd
-
-# import config
 import utilities
 
 
@@ -15,10 +13,7 @@ def preprocess(data, config, save_path=None):
     min_cluster_size = config["MIN_CLUSTER_SIZE"]
     crs = config["CRS"]
     list_of_dfs = []
-    i = 0
     for train_start in range(start_year, end_year - DBSCAN_TRAIN_INTERVAL - DBSCAN_TEST_INTERVAL + 2):
-        i = i + 1
-        print(i, train_start)
         train_end = train_start + DBSCAN_TRAIN_INTERVAL - 1
         test_start = train_end + 1
         test_end = test_start + DBSCAN_TEST_INTERVAL - 1
@@ -52,15 +47,6 @@ def preprocess(data, config, save_path=None):
         df_clusters = df_clusters[df_clusters['size'] >= min_cluster_size]
         df_clusters = add_severe_count(df_clusters, config, train_data, 'train_severe')
         df_clusters = add_severe_count(df_clusters, config, test_data, 'test_severe')
-
-        # NEW
-        # add severe and minor by years
-        df_clusters = add_severe_years_count(df_clusters, config, train_data, 'train_severe')
-        # df_clusters = add_minor_years_count(df_clusters, config, train_data, 'train_minor')
-        # NEW 2
-        # df_clusters = add_severity_years_count(df_clusters, config, train_data, 'train')
-        ## END NEW
-
         df_clusters = df_clusters[df_clusters.cluster != -1]
         df_clusters = add_cluster_type(df_clusters)
         for attribute in config["ATTRIBUTE_DICT"].keys():
@@ -100,9 +86,6 @@ def cluster_frame(frame, config, train_start, train_end, test_start, test_end):
                                                          train_clusters[config["Y_FEATURE"]], crs=crs))
     test = gpd.sjoin_nearest(test, train, how="left", distance_col="dist", lsuffix="test", rsuffix="train")
     test = test.reset_index().drop_duplicates(subset=config["INDEX_FEATURE"]).set_index(config["INDEX_FEATURE"])
-
-    # assert test["dist"].max() <= test_eps
-    # change cluster to -1 if dist > test_eps
     test.loc[test["dist"] > test_eps, "cluster"] = -1
     test_data["cluster"] = test["cluster"]
 
@@ -220,20 +203,3 @@ def add_cluster_type(df_clusters):
     df_clusters['type'] = np.select(conditions, values, default='Undefined')
     return df_clusters
 
-
-if __name__ == '__main__':
-    # # Load config
-    # config = utilities.load_config(use_uk=True)
-    # # Load data
-    # data_israel = pd.read_csv(config["DATA_PATH"], index_col=config["INDEX_FEATURE"])
-    # data_israel = data_israel[data_israel.STATUS_IGUN == 1]
-    # attribute_dict = utilities.create_attribute_dict(config["COUNTRY"], config["CODEBOOK_PATH"])
-    # cluster = preprocess(data_israel, config, attribute_dict)
-    # print(cluster.head())
-
-    # Load config
-    config_my = utilities.load_config(use_uk=True)
-    # Load data
-    data_uk, attribute_dict_my = utilities.load_data(config_my)
-    clusters = preprocess(data_uk, config_my, attribute_dict_my)
-    print(clusters.head())
