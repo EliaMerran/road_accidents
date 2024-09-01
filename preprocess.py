@@ -2,8 +2,6 @@ import geopandas as gpd
 from sklearn.cluster import DBSCAN
 import numpy as np
 import pandas as pd
-
-# import config
 import utilities
 
 
@@ -13,16 +11,9 @@ def preprocess(data, config, save_path=None):
     DBSCAN_TRAIN_INTERVAL = config["DBSCAN_TRAIN_INTERVAL"]
     DBSCAN_TEST_INTERVAL = config["DBSCAN_TEST_INTERVAL"]
     min_cluster_size = config["MIN_CLUSTER_SIZE"]
-    cluster_eps = config["EPS"]
-    test_eps = config["EPS"]  # Default to same as cluster_eps
-    min_samp = config["MIN_SAMPLES"]
     crs = config["CRS"]
-
     list_of_dfs = []
-    i = 0
     for train_start in range(start_year, end_year - DBSCAN_TRAIN_INTERVAL - DBSCAN_TEST_INTERVAL + 2):
-        i = i + 1
-        print(i, train_start)
         train_end = train_start + DBSCAN_TRAIN_INTERVAL - 1
         test_start = train_end + 1
         test_end = test_start + DBSCAN_TEST_INTERVAL - 1
@@ -53,8 +44,6 @@ def preprocess(data, config, save_path=None):
         # add index of test accidents in cluster
         test_indices = test_data.groupby('cluster').apply(lambda group: group.index.tolist())
         df_clusters['test_index'] = df_clusters['cluster'].apply(lambda cluster: test_indices.get(cluster, []))
-        # df_clusters['test_index'] = df_clusters['cluster'].map(test_indices)
-
         df_clusters = df_clusters[df_clusters['size'] >= min_cluster_size]
         df_clusters = add_severe_count(df_clusters, config, train_data, 'train_severe')
         df_clusters = add_severe_count(df_clusters, config, test_data, 'test_severe')
@@ -70,12 +59,6 @@ def preprocess(data, config, save_path=None):
         df_clusters['dangerous'] = df_clusters['test_severe'] > 0
         list_of_dfs.append(df_clusters)
     result_df = pd.concat(list_of_dfs, ignore_index=True)
-    # # Extract text features
-    # cats = result_df.select_dtypes(exclude=np.number).columns.tolist()
-    #
-    # # Convert to Pandas category
-    # for col in cats:
-    #     result_df[col] = result_df[col].astype('category')
     if save_path is not None:
         result_df.to_csv(save_path, index=False)
     return result_df
@@ -103,9 +86,6 @@ def cluster_frame(frame, config, train_start, train_end, test_start, test_end):
                                                          train_clusters[config["Y_FEATURE"]], crs=crs))
     test = gpd.sjoin_nearest(test, train, how="left", distance_col="dist", lsuffix="test", rsuffix="train")
     test = test.reset_index().drop_duplicates(subset=config["INDEX_FEATURE"]).set_index(config["INDEX_FEATURE"])
-
-    # assert test["dist"].max() <= test_eps
-    # change cluster to -1 if dist > test_eps
     test.loc[test["dist"] > test_eps, "cluster"] = -1
     test_data["cluster"] = test["cluster"]
 
@@ -154,6 +134,59 @@ def add_severe_count(df_clusters, config, frame, column_name):
     return df_clusters
 
 
+def add_minor_count(df_clusters, config, frame, column_name):
+    df_clusters = df_clusters.merge(
+        frame[frame[config["SEVERE_FEATURE"]] >= 3].groupby('cluster').size().reset_index(name=column_name),
+        how='left',
+        on='cluster'
+    )
+    df_clusters[column_name].fillna(0, inplace=True)
+    df_clusters[column_name] = df_clusters[column_name].astype(int)
+    return df_clusters
+
+
+def add_severe_years_count(df_clusters, config, frame, column_name):
+    for i, year in enumerate(frame[config["YEAR_FEATURE"]].unique()):
+        df_clusters = df_clusters.merge(
+            frame[(frame[config["SEVERE_FEATURE"]] < 3) & (frame[config["YEAR_FEATURE"]] == year)].groupby('cluster')
+            .size().reset_index(name=f'{column_name}_{i}'),
+            how='left',
+            on='cluster'
+        )
+        df_clusters[f'{column_name}_{i}'].fillna(0, inplace=True)
+        df_clusters[f'{column_name}_{i}'] = df_clusters[f'{column_name}_{i}'].astype(int)
+    return df_clusters
+
+
+def add_minor_years_count(df_clusters, config, frame, column_name):
+    for i, year in enumerate(frame[config["YEAR_FEATURE"]].unique()):
+        df_clusters = df_clusters.merge(
+            frame[(frame[config["SEVERE_FEATURE"]] >= 3) & (frame[config["YEAR_FEATURE"]] == year)].groupby('cluster')
+            .size().reset_index(name=f'{column_name}_{i}'),
+            how='left',
+            on='cluster'
+        )
+        df_clusters[f'{column_name}_{i}'].fillna(0, inplace=True)
+        df_clusters[f'{column_name}_{i}'] = df_clusters[f'{column_name}_{i}'].astype(int)
+    return df_clusters
+
+
+def add_severity_years_count(df_clusters, config, frame, column_name):
+    for i, year in enumerate(frame[config["YEAR_FEATURE"]].unique()):
+        for severity in frame[config["SEVERE_FEATURE"]].unique():
+            df_clusters = df_clusters.merge(
+                frame[(frame[config["SEVERE_FEATURE"]] == severity) & (frame[config["YEAR_FEATURE"]] == year)].
+                groupby('cluster')
+                .size().reset_index(name=f'{column_name}_{year}_{severity}'),
+                how='left',
+                on='cluster'
+            )
+            df_clusters[f'{column_name}_{year}_{severity}'].fillna(0, inplace=True)
+            df_clusters[f'{column_name}_{year}_{severity}'] = (df_clusters[f'{column_name}_{year}_{severity}'].
+                                                               astype(int))
+    return df_clusters
+
+
 def add_cluster_type(df_clusters):
     # Define the conditions
     conditions = [
@@ -170,20 +203,3 @@ def add_cluster_type(df_clusters):
     df_clusters['type'] = np.select(conditions, values, default='Undefined')
     return df_clusters
 
-
-if __name__ == '__main__':
-    # # Load config
-    # config = utilities.load_config(use_uk=True)
-    # # Load data
-    # data_israel = pd.read_csv(config["DATA_PATH"], index_col=config["INDEX_FEATURE"])
-    # data_israel = data_israel[data_israel.STATUS_IGUN == 1]
-    # attribute_dict = utilities.create_attribute_dict(config["COUNTRY"], config["CODEBOOK_PATH"])
-    # cluster = preprocess(data_israel, config, attribute_dict)
-    # print(cluster.head())
-
-    # Load config
-    config_my = utilities.load_config(use_uk=True)
-    # Load data
-    data_uk, attribute_dict_my = utilities.load_data(config_my)
-    clusters = preprocess(data_uk, config_my, attribute_dict_my)
-    print(clusters.head())
