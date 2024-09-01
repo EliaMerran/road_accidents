@@ -12,7 +12,7 @@ def save_plot(fig, save_path, title):
 
 def plot_roc_curve(df, color_feature, title='ROC Curve', show=True, save_path=None):
     fig = px.line(df, x='fpr', y='tpr', title=title,
-                  color=color_feature, hover_data=['thresholds'], labels={'fpr': 'FPR', 'tpr': 'TPR'})
+                  color=color_feature, hover_data=['thresholds', 'auc'], labels={'fpr': 'FPR', 'tpr': 'TPR'})
     if show:
         fig.show()
     if save_path:

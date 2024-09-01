@@ -294,8 +294,8 @@ def outliers_percentage_table(data, config, output_path=None):
     return result_df
 
 
-def location_accuracy_statistics(config, output_path=None):
-    data = utilities.get_accidents_data()
+def location_accuracy_statistics(config, with_damage_only=True,output_path=None):
+    data = utilities.get_accidents_data(with_damage_only=with_damage_only)
     # THIS IS ON 20 CITIES DATA
     city_mapping = utilities.get_city_mapping(config=config)
     city_keys = list(map(int, city_mapping.keys()))
@@ -320,11 +320,11 @@ def theoretical_overview(config, save_path):
                                                     save_path + 'accident_clusters_statistics_by_attribute.csv')
     outliers_percentage_table(data=data_cities, config=config, output_path=save_path + 'outliers_percentage.csv')
     if config['COUNTRY'] == 'ISRAEL':
-        location_accuracy_statistics(config=config, output_path=save_path + 'location_accuracy.csv')
+        location_accuracy_statistics(config=config, with_damage_only=False, output_path=save_path + 'location_accuracy.csv')
 
 
 if __name__ == '__main__':
     israel_config = utilities.load_config()
-    theoretical_overview(israel_config, save_path='data/theoretical overview/israel/')
-    uk_config = utilities.load_config(use_uk=True)
-    theoretical_overview(uk_config, save_path='data/theoretical overview/uk/')
+    theoretical_overview(israel_config, save_path='data/theoretical overview/3 1/israel without damage only/')
+    # uk_config = utilities.load_config(use_uk=True)
+    # theoretical_overview(uk_config, save_path='data/theoretical overview/uk/')

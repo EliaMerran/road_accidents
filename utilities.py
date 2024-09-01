@@ -26,12 +26,13 @@ def combine_data(directory, search_name, save_path=None):
         print(f"No files containing '{search_name}' found.")
 
 
-def get_accidents_data(save_path=None):
-    with_injuries = combine_data('data/raw data/accidents with injuries 2005-2021/', 'accdata.csv')
-    without_injuries = combine_data('data/raw data/accidents without injuries 2005-2021/',
-                                    'accdata.csv')
-    without_injuries['HUMRAT_TEUNA'] = 4
-    combined_df = pd.concat([with_injuries, without_injuries])
+def get_accidents_data(with_damage_only=True, save_path=None):
+    combined_df = combine_data('data/raw data/accidents with injuries 2005-2021/', 'accdata.csv')
+    if with_damage_only:
+        without_injuries = combine_data('data/raw data/accidents without injuries 2005-2021/',
+                                        'accdata.csv')
+        without_injuries['HUMRAT_TEUNA'] = 4
+        combined_df = pd.concat([combined_df, without_injuries])
     # combined_df = combined_df.drop_duplicates(subset="pk_teuna_fikt").set_index("pk_teuna_fikt")
     combined_df = combined_df.drop_duplicates()
 
@@ -214,8 +215,11 @@ def uk_cities_data(config, save_path=None):
 if __name__ == '__main__':
     # Israel
     config_israel = load_config(use_uk=False)
-    # save israel city mapping
-    get_israel_city_mapping(config_israel, 'data/Israel/city_mapping.json')
+    with_injuries = combine_data('data/raw data/accidents with injuries 2005-2021/', 'accdata.csv')
+    city_mapping = get_city_mapping(config=config_israel)
+    city_keys = list(map(int, city_mapping.keys()))
+    data = with_injuries[with_injuries[config_israel["CITY_FEATURE"]].isin(city_keys)]
 
+    with_injuries.to_csv('data/processed data/israel_cities_accidents_without_damage_only.csv')
     # save data
     # uk_cities_data(config,'data/United Kingdom/Accidents_cities.csv')

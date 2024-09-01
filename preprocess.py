@@ -13,11 +13,7 @@ def preprocess(data, config, save_path=None):
     DBSCAN_TRAIN_INTERVAL = config["DBSCAN_TRAIN_INTERVAL"]
     DBSCAN_TEST_INTERVAL = config["DBSCAN_TEST_INTERVAL"]
     min_cluster_size = config["MIN_CLUSTER_SIZE"]
-    cluster_eps = config["EPS"]
-    test_eps = config["EPS"]  # Default to same as cluster_eps
-    min_samp = config["MIN_SAMPLES"]
     crs = config["CRS"]
-
     list_of_dfs = []
     i = 0
     for train_start in range(start_year, end_year - DBSCAN_TRAIN_INTERVAL - DBSCAN_TEST_INTERVAL + 2):
@@ -53,11 +49,18 @@ def preprocess(data, config, save_path=None):
         # add index of test accidents in cluster
         test_indices = test_data.groupby('cluster').apply(lambda group: group.index.tolist())
         df_clusters['test_index'] = df_clusters['cluster'].apply(lambda cluster: test_indices.get(cluster, []))
-        # df_clusters['test_index'] = df_clusters['cluster'].map(test_indices)
-
         df_clusters = df_clusters[df_clusters['size'] >= min_cluster_size]
         df_clusters = add_severe_count(df_clusters, config, train_data, 'train_severe')
         df_clusters = add_severe_count(df_clusters, config, test_data, 'test_severe')
+
+        # NEW
+        # add severe and minor by years
+        df_clusters = add_severe_years_count(df_clusters, config, train_data, 'train_severe')
+        # df_clusters = add_minor_years_count(df_clusters, config, train_data, 'train_minor')
+        # NEW 2
+        # df_clusters = add_severity_years_count(df_clusters, config, train_data, 'train')
+        ## END NEW
+
         df_clusters = df_clusters[df_clusters.cluster != -1]
         df_clusters = add_cluster_type(df_clusters)
         for attribute in config["ATTRIBUTE_DICT"].keys():
@@ -70,12 +73,6 @@ def preprocess(data, config, save_path=None):
         df_clusters['dangerous'] = df_clusters['test_severe'] > 0
         list_of_dfs.append(df_clusters)
     result_df = pd.concat(list_of_dfs, ignore_index=True)
-    # # Extract text features
-    # cats = result_df.select_dtypes(exclude=np.number).columns.tolist()
-    #
-    # # Convert to Pandas category
-    # for col in cats:
-    #     result_df[col] = result_df[col].astype('category')
     if save_path is not None:
         result_df.to_csv(save_path, index=False)
     return result_df
@@ -151,6 +148,59 @@ def add_severe_count(df_clusters, config, frame, column_name):
     )
     df_clusters[column_name].fillna(0, inplace=True)
     df_clusters[column_name] = df_clusters[column_name].astype(int)
+    return df_clusters
+
+
+def add_minor_count(df_clusters, config, frame, column_name):
+    df_clusters = df_clusters.merge(
+        frame[frame[config["SEVERE_FEATURE"]] >= 3].groupby('cluster').size().reset_index(name=column_name),
+        how='left',
+        on='cluster'
+    )
+    df_clusters[column_name].fillna(0, inplace=True)
+    df_clusters[column_name] = df_clusters[column_name].astype(int)
+    return df_clusters
+
+
+def add_severe_years_count(df_clusters, config, frame, column_name):
+    for i, year in enumerate(frame[config["YEAR_FEATURE"]].unique()):
+        df_clusters = df_clusters.merge(
+            frame[(frame[config["SEVERE_FEATURE"]] < 3) & (frame[config["YEAR_FEATURE"]] == year)].groupby('cluster')
+            .size().reset_index(name=f'{column_name}_{i}'),
+            how='left',
+            on='cluster'
+        )
+        df_clusters[f'{column_name}_{i}'].fillna(0, inplace=True)
+        df_clusters[f'{column_name}_{i}'] = df_clusters[f'{column_name}_{i}'].astype(int)
+    return df_clusters
+
+
+def add_minor_years_count(df_clusters, config, frame, column_name):
+    for i, year in enumerate(frame[config["YEAR_FEATURE"]].unique()):
+        df_clusters = df_clusters.merge(
+            frame[(frame[config["SEVERE_FEATURE"]] >= 3) & (frame[config["YEAR_FEATURE"]] == year)].groupby('cluster')
+            .size().reset_index(name=f'{column_name}_{i}'),
+            how='left',
+            on='cluster'
+        )
+        df_clusters[f'{column_name}_{i}'].fillna(0, inplace=True)
+        df_clusters[f'{column_name}_{i}'] = df_clusters[f'{column_name}_{i}'].astype(int)
+    return df_clusters
+
+
+def add_severity_years_count(df_clusters, config, frame, column_name):
+    for i, year in enumerate(frame[config["YEAR_FEATURE"]].unique()):
+        for severity in frame[config["SEVERE_FEATURE"]].unique():
+            df_clusters = df_clusters.merge(
+                frame[(frame[config["SEVERE_FEATURE"]] == severity) & (frame[config["YEAR_FEATURE"]] == year)].
+                groupby('cluster')
+                .size().reset_index(name=f'{column_name}_{year}_{severity}'),
+                how='left',
+                on='cluster'
+            )
+            df_clusters[f'{column_name}_{year}_{severity}'].fillna(0, inplace=True)
+            df_clusters[f'{column_name}_{year}_{severity}'] = (df_clusters[f'{column_name}_{year}_{severity}'].
+                                                               astype(int))
     return df_clusters
 
 
