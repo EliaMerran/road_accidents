@@ -1,0 +1,160 @@
+attribute,attribute_majority_vote,clusters_count,clusters_percent,Consistent Severity,Improved Safety,Severe Turnaround,Stable Safety,severe_turnaround_probability,consistent_severe_probability,Accidents Percentage
+accident_severity,Fatal,13.78,0.27,0.89,12.89,0.0,0.0,,7.69,35.78
+accident_severity,Serious,215.0,4.4,26.56,188.44,0.0,0.0,,12.16,59.38
+accident_severity,Slight,4744.67,95.33,304.44,1643.11,294.0,2503.11,10.55,15.67,89.63
+carriageway_hazards,Other object on road,1.0,0.02,,0.5,,1.0,0.0,0.0,100.0
+carriageway_hazards,Pedestrian in carriageway - not injured,1.25,0.02,,1.33,,0.5,0.0,0.0,100.0
+carriageway_hazards,Previous accident,1.0,0.02,,,,1.0,0.0,0.0,100.0
+carriageway_hazards,unknown (self reported),4.0,0.09,,3.0,1.0,2.0,16.66,0.0,100.0
+day_of_week,Friday,524.44,10.51,40.89,201.44,33.78,248.33,11.94,17.01,45.9
+day_of_week,Monday,1098.22,22.07,69.67,388.0,63.67,576.89,10.0,15.25,36.09
+day_of_week,Saturday,337.33,6.78,30.11,133.78,19.44,154.0,11.32,18.44,45.98
+day_of_week,Sunday,993.33,20.06,58.22,373.22,58.44,503.44,10.49,13.5,33.08
+day_of_week,Thursday,509.89,10.26,37.78,194.11,27.78,250.22,10.1,16.38,42.92
+day_of_week,Tuesday,860.56,17.28,53.0,308.44,52.78,446.33,10.57,14.64,39.37
+day_of_week,Wednesday,649.67,13.04,42.22,245.44,38.11,323.89,10.58,14.64,41.59
+did_police_officer_attend_scene_of_accident,No,566.44,11.58,22.22,146.89,36.67,360.67,9.01,12.42,69.18
+did_police_officer_attend_scene_of_accident,Yes,4407.0,88.42,309.67,1697.56,257.33,2142.44,10.78,15.48,80.87
+first_road_class,A,2985.67,60.03,236.44,1141.44,190.44,1417.33,11.85,17.19,90.71
+first_road_class,A(M),15.78,0.31,0.78,3.67,0.67,10.67,6.32,17.78,78.73
+first_road_class,B,671.56,13.48,38.67,244.11,38.67,350.11,10.01,13.75,85.87
+first_road_class,C,261.67,5.21,11.0,84.0,11.56,155.11,7.39,12.01,89.59
+first_road_class,Motorway,88.44,1.76,1.22,25.78,2.78,58.67,4.32,4.82,92.67
+first_road_class,Unclassified,950.33,19.21,43.78,345.44,49.89,511.22,8.97,11.17,93.63
+junction_control,Authorised person,3.11,0.07,0.22,0.78,0.0,2.11,0.0,28.57,34.0
+junction_control,Auto traffic signal,1290.44,25.93,128.11,494.0,92.0,576.33,13.79,20.6,79.71
+junction_control,Data missing or out of range,608.56,12.41,30.67,241.44,24.33,312.11,7.23,11.28,78.44
+junction_control,Give way or uncontrolled,3005.0,60.33,170.33,1082.56,174.89,1577.22,10.1,13.66,85.72
+junction_control,Not at junction or within 20 metres,123.0,2.24,3.67,46.67,3.67,69.0,4.6,7.41,66.38
+junction_control,Stop sign,24.89,0.51,1.33,10.11,1.56,11.89,10.96,11.7,60.93
+junction_control,unknown (self reported),4.0,0.09,0.0,0.0,0.0,4.0,0.0,,58.82
+junction_detail,Crossroads,1098.44,22.07,107.22,425.33,76.22,489.67,13.47,20.12,79.79
+junction_detail,Mini-roundabout,81.78,1.65,2.56,23.33,4.78,51.11,8.75,9.42,72.59
+junction_detail,More than 4 arms (not roundabout),43.78,0.85,3.78,17.89,3.33,18.78,14.37,16.73,59.28
+junction_detail,Not at junction or within 20 metres,917.56,18.6,48.33,367.44,40.56,461.22,8.07,11.6,67.08
+junction_detail,Other junction,14.78,0.3,1.11,5.11,1.0,7.56,11.26,16.71,56.08
+junction_detail,Private drive or entrance,39.11,0.78,1.78,12.89,1.67,22.78,7.26,12.41,68.32
+junction_detail,Roundabout,583.89,11.76,33.22,177.89,36.67,336.11,9.83,15.81,84.05
+junction_detail,Slip road,34.0,0.68,1.44,10.56,1.0,21.0,5.12,11.84,71.03
+junction_detail,T or staggered junction,2160.0,43.3,132.44,803.89,128.78,1094.89,10.68,14.22,79.35
+junction_detail,unknown (self reported),1.0,0.02,0.0,1.0,0.0,0.0,,0.0,66.67
+light_conditions,Darkness - lighting unknown,14.75,0.3,0.12,5.25,0.88,8.5,4.98,2.08,61.14
+light_conditions,Darkness - lights lit,625.89,12.71,43.67,244.89,34.33,303.0,10.11,14.99,67.26
+light_conditions,Darkness - lights unlit,1.0,0.02,0.0,0.0,0.0,1.0,0.0,,66.67
+light_conditions,Darkness - no lighting,20.78,0.42,0.89,10.22,0.56,9.11,8.07,7.91,69.47
+light_conditions,Daylight,4313.44,86.6,287.22,1584.67,258.33,2183.22,10.63,15.37,75.3
+local_authority_district,Barnet,288.78,5.82,20.89,102.89,19.89,145.11,11.98,16.87,100.0
+local_authority_district,Birmingham,730.22,14.73,54.33,286.44,47.56,341.89,12.27,16.01,99.98
+local_authority_district,Bradford,288.22,5.75,15.44,103.44,17.0,152.33,10.02,13.1,99.92
+local_authority_district,"Bristol, City of",260.89,5.25,10.56,88.22,14.0,148.11,8.56,10.6,100.0
+local_authority_district,Cheshire East,147.22,2.94,6.56,61.11,6.33,73.22,7.38,9.61,99.95
+local_authority_district,Cheshire West and Chester,126.33,2.54,5.89,51.44,6.22,62.78,9.47,10.3,99.66
+local_authority_district,Cornwall,122.56,2.49,4.67,45.67,5.44,66.78,7.71,8.95,100.0
+local_authority_district,County Durham,120.67,2.43,5.0,44.33,5.22,66.11,7.79,10.72,100.0
+local_authority_district,Coventry,157.0,3.17,11.89,59.11,8.67,77.33,10.2,16.74,99.9
+local_authority_district,Croydon,268.33,5.42,15.33,80.11,17.33,155.56,10.37,16.32,100.0
+local_authority_district,Ealing,266.22,5.42,22.89,87.11,18.11,138.11,11.49,20.83,100.0
+local_authority_district,Kirklees,176.33,3.5,7.44,61.89,8.56,98.44,8.17,10.77,100.0
+local_authority_district,Leeds,436.11,8.77,34.0,170.44,24.11,207.56,10.42,16.55,99.92
+local_authority_district,Leicester,245.89,4.94,9.11,74.89,14.78,147.11,8.98,11.02,100.0
+local_authority_district,Liverpool,322.11,6.44,28.56,142.44,22.22,128.89,14.58,16.61,100.0
+local_authority_district,Manchester,293.33,5.79,20.67,112.78,17.22,142.67,11.15,15.27,100.0
+local_authority_district,Newham,219.78,4.46,23.78,76.22,15.44,104.33,12.84,23.69,100.0
+local_authority_district,Sheffield,277.56,5.58,23.11,100.22,16.89,137.33,11.42,18.66,100.0
+local_authority_district,Wakefield,116.33,2.32,6.33,50.33,4.78,54.89,7.85,11.19,99.98
+local_authority_district,Wiltshire,109.56,2.25,5.44,45.33,4.22,54.56,7.34,11.72,100.0
+local_authority_highway,Barnet,288.78,5.82,20.89,102.89,19.89,145.11,11.98,16.87,100.0
+local_authority_highway,Birmingham,730.22,14.73,54.33,286.44,47.56,341.89,12.27,16.01,99.98
+local_authority_highway,Bradford,288.22,5.75,15.44,103.44,17.0,152.33,10.02,13.1,99.92
+local_authority_highway,"Bristol, City of",260.89,5.25,10.56,88.22,14.0,148.11,8.56,10.6,100.0
+local_authority_highway,Cheshire East,147.22,2.94,6.56,61.11,6.33,73.22,7.38,9.61,99.95
+local_authority_highway,Cheshire West and Chester,126.33,2.54,5.89,51.44,6.22,62.78,9.47,10.3,99.66
+local_authority_highway,Cornwall,122.56,2.49,4.67,45.67,5.44,66.78,7.71,8.95,100.0
+local_authority_highway,County Durham,120.67,2.43,5.0,44.33,5.22,66.11,7.79,10.72,100.0
+local_authority_highway,Coventry,157.0,3.17,11.89,59.11,8.67,77.33,10.2,16.74,99.9
+local_authority_highway,Croydon,268.33,5.42,15.33,80.11,17.33,155.56,10.37,16.32,100.0
+local_authority_highway,Ealing,266.22,5.42,22.89,87.11,18.11,138.11,11.49,20.83,100.0
+local_authority_highway,Kirklees,176.33,3.5,7.44,61.89,8.56,98.44,8.17,10.77,100.0
+local_authority_highway,Leeds,436.11,8.77,34.0,170.44,24.11,207.56,10.42,16.55,99.92
+local_authority_highway,Leicester,245.89,4.94,9.11,74.89,14.78,147.11,8.98,11.02,100.0
+local_authority_highway,Liverpool,322.11,6.44,28.56,142.44,22.22,128.89,14.58,16.61,100.0
+local_authority_highway,Manchester,293.33,5.79,20.67,112.78,17.22,142.67,11.15,15.27,100.0
+local_authority_highway,Newham,219.78,4.46,23.78,76.22,15.44,104.33,12.84,23.69,100.0
+local_authority_highway,Sheffield,277.56,5.58,23.11,100.22,16.89,137.33,11.42,18.66,100.0
+local_authority_highway,Wakefield,116.33,2.32,6.33,50.33,4.78,54.89,7.85,11.19,99.98
+local_authority_highway,Wiltshire,109.56,2.25,5.44,45.33,4.22,54.56,7.34,11.72,100.0
+local_authority_ons_district,Barnet,288.78,5.82,20.89,102.89,19.89,145.11,11.98,16.87,100.0
+local_authority_ons_district,Birmingham,730.22,14.73,54.33,286.44,47.56,341.89,12.27,16.01,99.98
+local_authority_ons_district,Bradford,288.22,5.75,15.44,103.44,17.0,152.33,10.02,13.1,99.92
+local_authority_ons_district,"Bristol, City of",260.89,5.25,10.56,88.22,14.0,148.11,8.56,10.6,100.0
+local_authority_ons_district,Cheshire East,147.22,2.94,6.56,61.11,6.33,73.22,7.38,9.61,99.95
+local_authority_ons_district,Cheshire West and Chester,126.33,2.54,5.89,51.44,6.22,62.78,9.47,10.3,99.66
+local_authority_ons_district,Cornwall,122.56,2.49,4.67,45.67,5.44,66.78,7.71,8.95,100.0
+local_authority_ons_district,County Durham,120.67,2.43,5.0,44.33,5.22,66.11,7.79,10.72,100.0
+local_authority_ons_district,Coventry,157.0,3.17,11.89,59.11,8.67,77.33,10.2,16.74,99.9
+local_authority_ons_district,Croydon,268.33,5.42,15.33,80.11,17.33,155.56,10.37,16.32,100.0
+local_authority_ons_district,Ealing,266.22,5.42,22.89,87.11,18.11,138.11,11.49,20.83,100.0
+local_authority_ons_district,Kirklees,176.33,3.5,7.44,61.89,8.56,98.44,8.17,10.77,100.0
+local_authority_ons_district,Leeds,436.11,8.77,34.0,170.44,24.11,207.56,10.42,16.55,99.92
+local_authority_ons_district,Leicester,245.89,4.94,9.11,74.89,14.78,147.11,8.98,11.02,100.0
+local_authority_ons_district,Liverpool,322.11,6.44,28.56,142.44,22.22,128.89,14.58,16.61,100.0
+local_authority_ons_district,Manchester,293.33,5.79,20.67,112.78,17.22,142.67,11.15,15.27,100.0
+local_authority_ons_district,Newham,219.78,4.46,23.78,76.22,15.44,104.33,12.84,23.69,100.0
+local_authority_ons_district,Sheffield,277.56,5.58,23.11,100.22,16.89,137.33,11.42,18.66,100.0
+local_authority_ons_district,Wakefield,116.33,2.32,6.33,50.33,4.78,54.89,7.85,11.19,99.98
+local_authority_ons_district,Wiltshire,109.56,2.25,5.44,45.33,4.22,54.56,7.34,11.72,100.0
+pedestrian_crossing_human_control,Control by other authorised person,1.6,0.03,0.0,0.8,0.4,0.4,50.0,0.0,68.34
+pedestrian_crossing_human_control,Control by school crossing patrol,1.0,0.02,0.2,0.0,0.0,0.8,0.0,100.0,67.0
+pedestrian_crossing_human_control,None within 50 metres ,4970.56,99.94,331.67,1843.78,293.78,2501.33,10.55,15.28,99.13
+pedestrian_crossing_human_control,unknown (self reported),6.5,0.15,0.5,1.0,0.0,5.0,0.0,33.33,65.04
+pedestrian_crossing_physical_facilities,Central refuge,72.44,1.48,0.89,23.11,2.78,45.67,5.71,3.98,74.53
+pedestrian_crossing_physical_facilities,Footbridge or subway,12.56,0.24,0.22,3.11,0.44,8.78,3.07,6.43,81.89
+pedestrian_crossing_physical_facilities,No physical crossing facilities within 50 metres,3686.56,74.06,215.33,1349.0,210.67,1911.56,10.0,13.81,81.31
+pedestrian_crossing_physical_facilities,Pedestrian phase at traffic signal junction,640.89,12.94,74.0,249.89,44.44,272.56,13.96,22.83,75.43
+pedestrian_crossing_physical_facilities,"Pelican, puffin, toucan or similar non-junction pedestrian light crossing",373.78,7.5,30.33,152.89,23.44,167.11,12.23,16.54,69.57
+pedestrian_crossing_physical_facilities,Zebra,185.22,3.73,10.89,66.11,11.89,96.33,10.98,14.03,74.31
+pedestrian_crossing_physical_facilities,unknown (self reported),9.0,0.21,1.0,1.5,1.5,5.0,13.64,40.0,63.34
+police_force,Avon and Somerset,260.89,5.25,10.56,88.22,14.0,148.11,8.56,10.6,100.0
+police_force,Cheshire,273.56,5.48,12.44,112.56,12.56,136.0,8.35,9.93,100.0
+police_force,Devon and Cornwall,122.56,2.49,4.67,45.67,5.44,66.78,7.71,8.95,100.0
+police_force,Durham,120.67,2.43,5.0,44.33,5.22,66.11,7.79,10.72,100.0
+police_force,Greater Manchester,293.33,5.79,20.67,112.78,17.22,142.67,11.15,15.27,100.0
+police_force,Leicestershire,245.89,4.94,9.11,74.89,14.78,147.11,8.98,11.02,100.0
+police_force,Merseyside,322.11,6.44,28.56,142.44,22.22,128.89,14.58,16.61,100.0
+police_force,Metropolitan Police,1043.11,21.12,82.89,346.33,70.78,543.11,11.6,19.39,100.0
+police_force,South Yorkshire,277.56,5.58,23.11,100.22,16.89,137.33,11.42,18.66,100.0
+police_force,West Midlands,887.22,17.9,66.22,345.56,56.22,419.22,11.87,16.11,100.0
+police_force,West Yorkshire,1017.0,20.34,63.22,386.11,54.44,513.22,9.57,14.05,100.0
+police_force,Wiltshire,109.56,2.25,5.44,45.33,4.22,54.56,7.34,11.72,100.0
+road_surface_conditions,Dry,4373.33,88.01,303.67,1638.78,262.22,2168.67,10.81,15.65,78.32
+road_surface_conditions,Flood over 3cm. deep,1.5,0.03,0.0,1.0,0.0,0.5,0.0,0.0,66.67
+road_surface_conditions,Frost or ice,3.67,0.07,0.17,1.5,0.33,1.67,11.67,6.25,57.35
+road_surface_conditions,Snow,1.0,0.02,0.0,0.0,0.0,1.0,0.0,,66.67
+road_surface_conditions,Wet or damp,596.89,11.92,28.11,204.33,31.56,332.89,8.8,12.29,69.02
+road_surface_conditions,unknown (self reported),1.5,0.04,0.0,0.5,0.0,1.0,0.0,0.0,58.34
+road_type,Dual carriageway,926.22,18.66,81.78,361.44,57.78,425.22,11.98,18.43,77.86
+road_type,One way street,105.67,2.12,6.67,36.89,6.0,56.11,9.66,15.38,66.48
+road_type,Roundabout,522.11,10.52,26.89,158.11,33.33,303.78,9.92,14.59,70.84
+road_type,Single carriageway,3390.56,68.12,215.78,1279.89,195.89,1699.0,10.4,14.47,92.3
+road_type,Slip road,28.22,0.56,0.78,7.78,1.0,18.67,4.57,7.98,67.58
+road_type,Unknown,3.0,0.06,0.0,1.5,0.0,1.5,0.0,0.0,59.34
+second_road_class,A,767.22,15.39,76.89,270.78,57.33,362.22,13.67,22.09,75.99
+second_road_class,A(M),9.56,0.19,0.33,1.11,0.44,7.67,5.87,28.57,72.59
+second_road_class,B,341.22,6.84,33.0,127.0,21.44,159.78,12.13,20.67,69.95
+second_road_class,C,338.78,6.76,25.33,132.11,22.56,158.78,12.62,16.31,76.75
+second_road_class,Data missing or out of range,6.0,0.11,0.33,1.0,0.17,4.5,2.5,25.0,62.71
+second_road_class,Motorway,28.22,0.56,0.56,8.78,0.67,18.22,3.44,8.3,72.18
+second_road_class,Not at junction or within 20 metres,855.67,17.35,44.11,340.22,36.56,434.78,7.71,11.44,69.85
+second_road_class,Unclassified,2628.78,52.84,151.44,963.78,154.89,1358.67,10.34,13.61,83.19
+trunk_road_flag,Non-trunk,4814.56,96.82,326.89,1792.33,287.78,2407.56,10.72,15.46,99.87
+trunk_road_flag,Trunk (Roads managed by Highways England),158.89,3.18,5.0,52.11,6.22,95.56,6.03,8.86,93.19
+urban_or_rural_area,Rural,553.56,11.16,25.89,222.33,26.22,279.11,8.53,10.43,97.37
+urban_or_rural_area,Urban,4419.89,88.84,306.0,1622.11,267.78,2224.0,10.8,15.9,99.54
+weather_conditions,Fine + high winds,1.71,0.03,0.0,0.57,0.0,1.14,0.0,0.0,58.16
+weather_conditions,Fine no high winds,4814.33,96.81,327.78,1795.33,286.11,2405.11,10.67,15.47,82.49
+weather_conditions,Fog or mist,1.0,0.02,0.33,0.67,0.0,0.0,,33.33,66.67
+weather_conditions,Other,7.78,0.16,0.11,3.0,0.33,4.33,6.94,2.22,62.47
+weather_conditions,Raining + high winds,2.33,0.05,0.0,0.44,0.22,1.67,9.26,0.0,58.87
+weather_conditions,Raining no high winds,136.33,2.72,3.89,41.0,6.67,84.78,7.62,8.73,63.35
+weather_conditions,Snowing no high winds,1.0,0.02,0.0,0.5,0.0,0.5,0.0,0.0,37.5
+weather_conditions,Unknown,10.56,0.22,0.0,3.78,0.67,6.11,9.26,0.0,61.32
