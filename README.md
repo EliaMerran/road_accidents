@@ -26,7 +26,7 @@ git clone https://github.com/EliaMerran/road_accidents.git
 - `preprocess.py`: preprocess the data, creates the clusters and more.
 - `graphs_templates.py`: contains templates for useful graphs.
 - `utilities.py`: contains utility functions.
-- `theoretical_overview.py`: create all theoretical overview tables.
+- `theoretical_overview.py`: create all theoretical overview tables. 
 
 ### Setup
 #### Option 1:
@@ -36,3 +36,5 @@ git clone https://github.com/EliaMerran/road_accidents.git
 2. Download United Kingdom data from https://www.data.gov.uk/dataset/cb7ae6f0-4be6-4935-9277-47e5ce24a11f/road-safety-data
 3. Move '[dft-road-casualty-statistics-collision-1979-latest-published-year.csv](data%2Fraw%20data%2Fuk%2Fdft-road-casualty-statistics-collision-1979-latest-published-year.csv)' to data/United Kingdom and rename it to 'Accidents.csv'
 4. Run model_data_setup.py
+
+#### Comment: for the theoretical_overview workflow you need the Israel raw data under data/raw data (Option 2).
