@@ -1,3 +1,5 @@
+import os.path
+
 import pandas as pd
 import numpy as np
 import geopandas as gpd
@@ -356,11 +358,20 @@ def theoretical_overview(config, save_path):
                                                     save_path + 'accident_clusters_statistics_by_attribute.csv')
     outliers_percentage_table(data=data_cities, config=config, output_path=save_path + 'outliers_percentage.csv')
     if config['COUNTRY'] == 'ISRAEL':
-        location_accuracy_statistics(config=config, with_damage_only=False, output_path=save_path + 'location_accuracy.csv')
+        location_accuracy_statistics(config=config, with_damage_only=True, output_path=save_path + 'location_accuracy.csv')
 
 
 if __name__ == '__main__':
     israel_config = utilities.load_config()
-    theoretical_overview(israel_config, save_path='data/theoretical overview/Israel/')
-    uk_config = utilities.load_config(use_uk=True)
-    theoretical_overview(uk_config, save_path='data/theoretical overview/United Kingdom/')
+    print(israel_config)
+    for train_len in [2, 3, 4, 5]:
+        for test_len in [1, 2, 3]:
+            israel_config["DBSCAN_TRAIN_INTERVAL"] = train_len
+            israel_config["DBSCAN_TEST_INTERVAL"] = test_len
+            save_dir = f"data/theoretical overview/Israel/{train_len}_{test_len}/"
+            if not os.path.exists(save_dir):
+                os.makedirs(save_dir)
+            theoretical_overview(israel_config, save_path=save_dir)
+
+    #uk_config = utilities.load_config(use_uk=True)
+    #theoretical_overview(uk_config, save_path='data/theoretical overview/United Kingdom/')
