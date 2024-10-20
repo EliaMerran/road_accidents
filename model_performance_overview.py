@@ -1,3 +1,5 @@
+import os.path
+
 import graphs_templates
 import utilities
 import xgboost as xgb
@@ -35,10 +37,9 @@ def performance_overview(model_path, data, clusters, config, save_path, title, s
     return pred_fig, df
 
 
-def compare_models(models, configs, clusters, titles):
+def compare_models(models, configs, clusters, titles, save_path=None):
     pred_figs = []
     roc_dfs = []
-    save_path = r'C:\code\road_accidents\graphs\model improvements\\'
     for model, conf, cluster_data, title in zip(models, configs, clusters, titles):
         cities_data = utilities.load_cities_data(conf)
         fig, roc_df = performance_overview(model, cities_data, cluster_data, conf, save_path, title=title, show=False)
@@ -52,23 +53,22 @@ def compare_models(models, configs, clusters, titles):
                                     save_path=save_path)
 
 
-def compare_israel_uk():
+def compare_israel_uk(save_path):
     config_israel = utilities.load_config()
     config_uk = utilities.load_config(use_uk=True)
     configs = [config_israel, config_uk]
     pred_figs = []
     roc_dfs = []
-    save_path = r'C:\code\road_accidents\graphs\model_performance_overview\\'
     for conf in configs:
         data = utilities.load_data(conf)
         cities_data = utilities.load_cities_data(conf)
         for i in range(2):
             if i == 0:
-                new_save_path = save_path + conf["COUNTRY"] + '\\'
+                new_save_path = save_path + conf["COUNTRY"] + '_'
                 model_path = conf["MODEL_PATH"]
                 city = False
             else:
-                new_save_path = save_path + conf["COUNTRY"] + '\Cities\\'
+                new_save_path = save_path + conf["COUNTRY"] + '_Cities_'
                 model_path = conf["CITY_MODEL_PATH"]
                 city = True
             fig, roc_df = performance_overview(model_path, data, cities_data, conf, new_save_path, city)
@@ -92,4 +92,4 @@ if __name__ == '__main__':
         df = pd.read_csv(model.replace(".json", "_data.csv"))
         clusters.append(df)
     titles = ['Israel City Model', 'United Kingdom City Model']
-    compare_models(models, configs, clusters, titles)
+    compare_models(models, configs, clusters, titles, save_path=os.path.realpath("out/fig_"))

@@ -44,14 +44,16 @@ def top_dangerous_city_clusters_on_map(config, n_clusters, threshold=0):
     top_clusters.drop(columns=['train_index', 'test_index'], inplace=True)
     top_gdf = gpd.GeoDataFrame(top_clusters, geometry='geometry_x', crs=config["CRS"])
     top_gdf = top_gdf.explode(index_parts=True)
-    out = top_gdf.explore(marker_kwds={"radius": 8}, column='cluster', symbol='accurate', legend=True, cmap='tab20',
+    out = top_gdf.explore(marker_kwds={"radius": 8}, column='cluster', # symbol='accurate',
+                          legend=True, cmap='tab20',
                           tooltip=hover_columns)
 
-    out.save(f"graphs/dangerous_clusters/top_{n_clusters}_clusters.html")
+    path = os.path.realpath(f"out/graphs_dangerous_clusters_top_{n_clusters}_clusters.html")
+    out.save(path)
 
-    webbrowser.open('file://' + os.path.realpath(f'graphs/dangerous_clusters/top_{n_clusters}_clusters.html'))
+    webbrowser.open('file://' + path)
 
 
 if __name__ == '__main__':
-    config = utilities.load_config(use_uk=True)
-    top_dangerous_city_clusters_on_map(config, 20)
+    israel_config = utilities.load_config()
+    top_dangerous_city_clusters_on_map(israel_config, 1000)
